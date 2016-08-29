@@ -1,1 +1,3 @@
-{}
+{
+  "test_LexicalAnalyzer.py::test_parse": true
+}

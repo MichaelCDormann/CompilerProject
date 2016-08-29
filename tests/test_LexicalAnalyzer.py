@@ -8,13 +8,13 @@ def test_reverse_token_dict():
     assert tokens == reversed_dict
 
 def test_parse():
-    output = "\nINPUT: int\nkeyword: int"
+    output = [("keyword", "int", 0)]
 
     fake_file = FakeFile("int")
     analyzer = LexicalAnalyzer(fake_file)
     result = analyzer.analyze()
 
-    assert result.text == output
+    assert result == output
 
 
 class FakeFile:
