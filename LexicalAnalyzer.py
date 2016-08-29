@@ -40,7 +40,8 @@ class LexicalAnalyzer:
 
         with self.file.open() as f:
             for line in f:
-                print "INPUT: " + line
+                line = line.strip('\n') + " "
+                print "INPUT: " + line.strip('\n')
 
                 for character in line:
                     result = self.parse(character)
@@ -79,15 +80,16 @@ class LexicalAnalyzer:
             token = tokens[cls.current_string]
             lexum = cls.current_string
             cls.current_string = character if re.match("\s", character) is None else ""
-        elif re.match("\s", character) is not None:
+        #elif re.match("\s", character) is not None:
+        elif re.search("[^A-Za-z0-9]+", cur_string) is not None:
             if re.match("[A-Za-z]+", cls.current_string) is not None:
                 token = "ID"
                 lexum = cls.current_string
-                cls.current_string = ""
+                cls.current_string = character
             elif re.match("[0-9]+", cls.current_string) is not None:
                 token = "Num"
                 lexum = cls.current_string
-                cls.current_string = ""
+                cls.current_string = character
             elif len(cls.current_string) > 0:
                 print "ERROR: " + cls.current_string + " not in grammar"
                 cls.current_string = ""
@@ -95,20 +97,28 @@ class LexicalAnalyzer:
         if lexum == "/*":
             cls.comment_counter += 1
             lexum = None
+            cur_string = ""
+            character = ""
         elif lexum == "*/":
             cls.comment_counter -= 1
             lexum = None
+            cur_string = ""
+            character = ""
         elif lexum == "{":
             cls.scope_counter += 1
         elif lexum == "}":
             cls.scope_counter -= 1
 
         #inside a comment
-        if cls.comment_counter > 0:
+        if cls.comment_counter > 0 and character != "*" and character != "/":
             cls.current_string = ""
+            return None
+        elif cls.comment_counter > 0 and (character == "*" or character == "/"):
+            cls.current_string = character
             return None
 
         if token is not None and lexum is not None:
+            print token + ": " + lexum
             return (token, lexum, cls.scope_counter)
         elif re.match("\s", character) is None:
             cls.current_string = cur_string
