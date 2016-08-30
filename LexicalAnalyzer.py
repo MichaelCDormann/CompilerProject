@@ -5,9 +5,6 @@ tokens = {}
 tokens_temp = {"keyword": ("else", "if", "int", "return", "void", "while", "float"),
                "symbol": ("+", "-", "*", "/", "//", "<", "<=", ">", ">=", "==", "!=", "=", ";", ",", "(", ")", "[", "]", "{", "}", "/*", "*/")}
 
-num = [i for i in range(0,9)]
-id = [chr(i) for i in range(65, 122) if not (90 < i < 97)]
-
 
 def reverse_token_dict():
     global tokens_temp, tokens, token_keys
@@ -124,9 +121,3 @@ class LexicalAnalyzer:
             cls.current_string = cur_string
         else:
             return None
-
-
-fl = FileAccessManager(sys.argv[1])
-analyzer = LexicalAnalyzer(fl)
-result = analyzer.analyze()
-print result
