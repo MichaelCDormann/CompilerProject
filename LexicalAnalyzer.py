@@ -29,15 +29,14 @@ def check_num(str):
     else:
         return False
 
-def check_foat(str):
-    flt = "-?[0-9]+(\.)?E-?[0-9]"
-    if re.match(num, str):
+def check_float(str):
+    flt = "-?[0-9]+(\.[0-9]+)?E-?[0-9]"
+    if re.match(flt, str):
         return True
     else:
         return False
 
-tokens = {"keyword": check_keyword,
-          "symbol": check_symbol}
+tokens = {"keyword": check_keyword, "symbol": check_symbol, "id": check_id, "num": check_num, "float": check_float}
 
 class FileAccessManager:
 
@@ -70,6 +69,13 @@ class LexicalAnalyzer:
                         token_lexum_tuple.append(result)
 
         return token_lexum_tuple
+
+    @staticmethod
+    def check_matching_token(str):
+        for token, func in tokens.iteritems():
+            if func(str):
+                return token
+        return None
 
     @staticmethod
     def check_substring(substr):
