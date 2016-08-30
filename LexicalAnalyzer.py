@@ -16,21 +16,25 @@ def check_symbol(str):
         return False
 
 def check_id(str):
-    id = r'[A-Za-z]+'
+    id = "[A-Za-z]+$"
     if re.match(id, str):
         return True
     else:
         return False
 
 def check_num(str):
-    num = "[0-9]+"
-    if re.match(num, str) is not None:
+    num = "-?[0-9]+$"
+    if re.match(num, str):
         return True
     else:
         return False
 
 def check_foat(str):
-    flt = r''
+    flt = "-?[0-9]+(\.)?E-?[0-9]"
+    if re.match(num, str):
+        return True
+    else:
+        return False
 
 tokens = {"keyword": check_keyword,
           "symbol": check_symbol}
