@@ -1,5 +1,4 @@
 import re
-import sys
 
 tokens = {}
 tokens_temp = {"keyword": ("else", "if", "int", "return", "void", "while", "float"),
@@ -79,11 +78,11 @@ class LexicalAnalyzer:
             cls.current_string = character if re.match("\s", character) is None else ""
         #elif re.match("\s", character) is not None:
         elif re.search("[^A-Za-z0-9]+", cur_string):
-            if re.match("[A-Za-z]+", cls.current_string):
+            if re.match("[A-Za-z]+$", cls.current_string) is not None:
                 token = "ID"
                 lexum = cls.current_string
                 cls.current_string = character if re.match("\s", character) is None else ""
-            elif re.match("[0-9]+", cls.current_string):
+            elif re.match("[0-9]+$", cls.current_string):
                 token = "Num"
                 lexum = cls.current_string
                 cls.current_string = character if re.match("\s", character) is None else ""
