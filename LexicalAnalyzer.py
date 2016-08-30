@@ -78,15 +78,15 @@ class LexicalAnalyzer:
             lexum = cls.current_string
             cls.current_string = character if re.match("\s", character) is None else ""
         #elif re.match("\s", character) is not None:
-        elif re.search("[^A-Za-z0-9]+", cur_string) is not None:
-            if re.match("[A-Za-z]+", cls.current_string) is not None:
+        elif re.search("[^A-Za-z0-9]+", cur_string):
+            if re.match("[A-Za-z]+", cls.current_string):
                 token = "ID"
                 lexum = cls.current_string
-                cls.current_string = character
-            elif re.match("[0-9]+", cls.current_string) is not None:
+                cls.current_string = character if re.match("\s", character) is None else ""
+            elif re.match("[0-9]+", cls.current_string):
                 token = "Num"
                 lexum = cls.current_string
-                cls.current_string = character
+                cls.current_string = character if re.match("\s", character) is None else ""
             elif len(cls.current_string) > 0:
                 print "ERROR: " + cls.current_string + " not in grammar"
                 cls.current_string = ""
