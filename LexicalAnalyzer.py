@@ -1,19 +1,39 @@
 import re
 import sys
 
-tokens = {}
-tokens_temp = {"keyword": ("else", "if", "int", "return", "void", "while", "float"),
-               "symbol": ("+", "-", "*", "/", "//", "<", "<=", ">", ">=", "==", "!=", "=", ";", ",", "(", ")", "[", "]", "{", "}", "/*", "*/")}
+def check_keyword(str):
+    keywords = ["else", "if", "int", "return", "void", "while", "float"]
+    if str in keywords:
+        return True
+    else:
+        return False
 
+def check_symbol(str):
+    symbols = ["+", "-", "*", "/", "//", "<", "<=", ">", ">=", "==", "!=", "=", ";", ",", "(", ")", "[", "]", "{", "}", "/*", "*/"]
+    if str in symbols:
+        return True
+    else:
+        return False
 
-def reverse_token_dict():
-    global tokens_temp, tokens, token_keys
-    for key, values in tokens_temp.iteritems():
-        for value in values:
-           tokens[value] = key
+def check_id(str):
+    id = r'[A-Za-z]+'
+    if re.match(id, str):
+        return True
+    else:
+        return False
 
-reverse_token_dict()
+def check_num(str):
+    num = "[0-9]+"
+    if re.match(num, str) is not None:
+        return True
+    else:
+        return False
 
+def check_foat(str):
+    flt = r''
+
+tokens = {"keyword": check_keyword,
+          "symbol": check_symbol}
 
 class FileAccessManager:
 
