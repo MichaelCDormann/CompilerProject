@@ -1,3 +1,4 @@
+import sys
 from LexicalAnalyzer import *
 
 fl = FileAccessManager(sys.argv[1])

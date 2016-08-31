@@ -1,153 +1,150 @@
 import re
-import sys
 
-def check_keyword(str):
-    keywords = ["else", "if", "int", "return", "void", "while", "float"]
-    if str in keywords:
-        return True
-    else:
-        return False
+def check_keyword(str, *args, **kwargs):
+	keywords = ["else", "if", "int", "return", "void", "while", "float"]
+	if str in keywords:
+		return True
+	else:
+		return False
 
-def check_symbol(str):
-    symbols = ["+", "-", "*", "/", "//", "<", "<=", ">", ">=", "==", "!=", "=", ";", ",", "(", ")", "[", "]", "{", "}", "/*", "*/"]
-    if str in symbols:
-        return True
-    else:
-        return False
+def check_symbol(str, check_substrings=False, *args, **kwargs):
+	symbols = ["+", "-", "*", "/", "//", "<", "<=", ">", ">=", "==", "!=", "=", ";", ",", "(", ")", "[", "]", "{", "}", "/*", "*/"]
+	if check_substrings:
+		for symbol in symbols:
+			if str in symbol and str != symbol:
+				return False #str is a substring of another value in the list other than itself, need to check next char
+		return True
+	elif str in symbols:
+		return True
+	else:
+		return False
 
-def check_id(str):
-    id = "[A-Za-z]+$"
-    if re.match(id, str):
-        return True
-    else:
-        return False
+def check_id(str, *args, **kwargs):
+	id = "[A-Za-z]+$"
+	if re.match(id, str):
+		return True
+	else:
+		return False
 
-def check_num(str):
-    num = "-?[0-9]+$"
-    if re.match(num, str):
-        return True
-    else:
-        return False
+def check_num(str, *args, **kwargs):
+	num = "-?[0-9]+$"
+	if re.match(num, str):
+		return True
+	else:
+		return False
 
-def check_float(str):
-    flt = "-?[0-9]+(\.[0-9]+)?E-?[0-9]"
-    if re.match(flt, str):
-        return True
-    else:
-        return False
-
-tokens = {"keyword": check_keyword, "symbol": check_symbol, "id": check_id, "num": check_num, "float": check_float}
+def check_float(str, *args, **kwargs):
+	flt = "-?[0-9]+(\.[0-9]+)?E-?[0-9]+$"
+	if re.match(flt, str):
+		return True
+	else:
+		return False
 
 class FileAccessManager:
 
-    def __init__(self, filename):
-        self.filename = filename
+	def __init__(self, filename):
+		self.filename = filename
 
-    def open(self):
-        return open(self.filename, 'r')
+	def open(self):
+		return open(self.filename, 'r')
 
 class LexicalAnalyzer:
 
-    comment_counter = 0
-    scope_counter = 0
-    current_string = ""
+	tokens = {"keyword": check_keyword, "symbol": check_symbol, "id": check_id, "num": check_num, "float": check_float}
 
-    def __init__(self, file_access_wrapper):
-        self.file = file_access_wrapper
+	comment_counter = 0
+	scope_counter = 0
+	current_string = ""
 
-    def analyze(self):
-        token_lexum_tuple = []
+	def __init__(self, file_access_wrapper):
+		self.file = file_access_wrapper
 
-        with self.file.open() as f:
-            for line in f:
-                line = line.strip('\n') + " "
-                print "INPUT: " + line.strip('\n')
+	def analyze(self):
+		token_lexum_tuple = []
 
-                for character in line:
-                    result = self.parse(character)
-                    if result is not None:
-                        token_lexum_tuple.append(result)
+		with self.file.open() as f:
+			for line in f:
+				line = line.strip('\n') + " "
+				print "INPUT: " + line.strip('\n')
 
-        return token_lexum_tuple
+				for character in line:
+					result = self.parse(character)
+					if result is not None:
+						token_lexum_tuple.append(result)
 
-    @staticmethod
-    def check_matching_token(str):
-        for token, func in tokens.iteritems():
-            if func(str):
-                return token
-        return None
+		return token_lexum_tuple
 
-    @staticmethod
-    def check_substring(substr):
-        for value in tokens.keys():
-            if substr in value and substr != value:
-                return True
-        return False
+	@classmethod
+	def check_matching_token(cls, str, check_substring=False):
+		for token, func in cls.tokens.iteritems():
+			if func(**{"str": str, "check_substring": check_substring}):
+				return token
+		return None
 
-    @classmethod
-    def parse(cls, character):
-        lexum = None
-        token = None
+	@classmethod
+	def parse(cls, character):
+		lexum = None
+		token = None
 
-        #if current_string is empty and character is not a whitespace character and not inside a comment
-        if cls.current_string == "" and re.match("\s", character) is None and cls.comment_counter == 0:
-            cls.current_string = character
-            return None
+		#if current_string is empty and character is not a whitespace character and not inside a comment
+		if cls.current_string == "" and re.match("\s", character) is None and cls.comment_counter == 0:
+			cls.current_string = character
+			return None
 
-        cur_string = cls.current_string + character
+		cur_string = cls.current_string + character
 
-        #if current_string + the new character is in tokens not a substring of another value in tokens
-        if cur_string in tokens and not cls.check_substring(cur_string):
-            token = tokens[cur_string]
-            lexum = cur_string
-            cls.current_string = ""
-        #if current_string is in tokens (string without new character)
-        elif cls.current_string in tokens:
-            #since character isn't being used in this lexum, add it to be used in the next(unless it's whitespace)
-            token = tokens[cls.current_string]
-            lexum = cls.current_string
-            cls.current_string = character if re.match("\s", character) is None else ""
-        #elif re.match("\s", character) is not None:
-        elif re.search("[^A-Za-z0-9]+", cur_string):
-            if re.match("[A-Za-z]+", cls.current_string):
-                token = "ID"
-                lexum = cls.current_string
-                cls.current_string = character if re.match("\s", character) is None else ""
-            elif re.match("[0-9]+", cls.current_string):
-                token = "Num"
-                lexum = cls.current_string
-                cls.current_string = character if re.match("\s", character) is None else ""
-            elif len(cls.current_string) > 0:
-                print "ERROR: " + cls.current_string + " not in grammar"
-                cls.current_string = ""
+		#if current_string + the new character is in tokens not a substring of another value in tokens
+		if cls.check_matching_token(cur_string, True):
+			token = cls.check_matching_token(cur_string, True)
+			lexum = cur_string
+			cls.current_string = ""
+		#if current_string is in tokens (string without new character)
+		elif cls.check_matching_token(cls.current_string):
+			#since character isn't being used in this lexum, add it to be used in the next(unless it's whitespace)
+			token = cls.check_matching_token(cls.current_string)
+			lexum = cls.current_string
+			cls.current_string = character if re.match("\s", character) is None else ""
+		#elif re.match("\s", character) is not None:
+		elif re.search("[^A-Za-z0-9]+", cur_string):
+			if re.match("[A-Za-z]+", cls.current_string):
+				token = "ID"
+				lexum = cls.current_string
+				cls.current_string = character if re.match("\s", character) is None else ""
+			elif re.match("[0-9]+", cls.current_string):
+				token = "Num"
+				lexum = cls.current_string
+				cls.current_string = character if re.match("\s", character) is None else ""
+			elif len(cls.current_string) > 0:
+				print "ERROR: " + cls.current_string + " not in grammar"
+				cls.current_string = ""
 
-        if lexum == "/*":
-            cls.comment_counter += 1
-            lexum = None
-            cur_string = ""
-            character = ""
-        elif lexum == "*/":
-            cls.comment_counter -= 1
-            lexum = None
-            cur_string = ""
-            character = ""
-        elif lexum == "{":
-            cls.scope_counter += 1
-        elif lexum == "}":
-            cls.scope_counter -= 1
+		if lexum == "/*":
+			cls.comment_counter += 1
+			lexum = None
+			cur_string = ""
+			character = ""
+		elif lexum == "*/":
+			cls.comment_counter -= 1
+			lexum = None
+			cur_string = ""
+			character = ""
+		elif lexum == "{":
+			cls.scope_counter += 1
+		elif lexum == "}":
+			cls.scope_counter -= 1
 
-        #inside a comment
-        if cls.comment_counter > 0 and character != "*" and character != "/":
-            cls.current_string = ""
-            return None
-        elif cls.comment_counter > 0 and (character == "*" or character == "/"):
-            cls.current_string = character
-            return None
+		#inside a comment
+		if cls.comment_counter > 0 and character != "*" and character != "/":
+			cls.current_string = ""
+			return None
+		elif cls.comment_counter > 0 and (character == "*" or character == "/"):
+			cls.current_string = character
+			return None
 
-        if token is not None and lexum is not None:
-            print token + ": " + lexum
-            return (token, lexum, cls.scope_counter)
-        elif re.match("\s", character) is None:
-            cls.current_string = cur_string
-        else:
-            return None
+		if token is not None and lexum is not None:
+			print token + ": " + lexum
+			return (token, lexum, cls.scope_counter)
+		elif re.match("\s", character) is None:
+			cls.current_string = cur_string
+		else:
+			return None
