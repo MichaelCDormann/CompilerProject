@@ -77,7 +77,7 @@ class LexicalAnalyzer:
 			lexum = cls.current_string
 			cls.current_string = character if re.match("\s", character) is None else ""
 		#elif re.match("\s", character) is not None:
-		elif re.search("[^A-Za-z0-9]+", cur_string):
+		elif re.search("[^A-Za-z0-9.E]+", cur_string):
 			if re.match("[A-Za-z]+$", cls.current_string) is not None:
 				token = "id"
 				lexum = cls.current_string
