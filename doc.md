@@ -1,0 +1,43 @@
+# COP 4620 - Construction of Language Translators
+
+**Project 1 - Lexical Analyzer**
+Michael Dormann
+N00958758
+
+Dr. Roger Eggen
+Due 9/22/16 Thursday, 11:59 PM
+Turn in ...
+
+### Project Scope
+
+The goal of this project is to create a lexical analyzer that returns tokens and lexums from the source file of a program
+written in the language of C-. These tokens and lexums will serve as inputs to the parser in project 2. The language is defined
+in the appendix of the text ***Compiler Construction, Principles and Practice by Louden***. 
+
+For the purpose of this project `float` has been added to the valid keywords. In addition the lexical analyzer (and by extension 
+the entire compiler) has to be able to handle normal single line comments, block comments, and nested comments. Also the 
+nested depth (scope) of identifiers needs to be returned.
+ 
+### General Design
+
+I have chosen to write this program entirely in python.
+
+All of the keywords and symbols are stored in a python dictionary, with the lexum as the key and the associated value as the 
+token. An instance of a LexicalAnalyzer object is created with a FileAccessManager object as an attribute. Then the analyzer's 
+`.analyze()` function is called, which reads each line from the file. As the function reads each line it prints the entire line, 
+then passes each character to the analyzer's `.parse()` function.
+
+The `.parse()` function takes a character and adds it to the current string of characters, then it checks to see if the current
+string exists in the keywords/symbols dictionary or if it should be stored as one of the other tokens (id, num, or float). If a 
+value is found the token and lexum are printed and a tuple containing the token, lexum, and depth is returned. Values that can't
+be placed in any category cause an error to be printed and don't return anything.
+
+If a starting block comment is encountered `/*` any input characters are ignored until an equivalent closing comment is found 
+`*/`. Inline comments are defined by `//` and cause the entire line after the comment to be ignored.
+  
+Floating number values are defined this way: `-?[0-9]+(\.[0-9]+)?E-?[0-9]+` 
+
+### How to Run
+
+* Obtain(somehow) a source file for a program written C-
+* Run the Lexical Analyzer with the command `./p1 [source file name]`
