@@ -37,7 +37,14 @@ class LexicalAnalyzer:
 		with self.file.open() as f:
 			for line in f:
 				line = line.strip('\n') + " "
-				print "INPUT: " + line.strip('\n')
+
+				if len(line.strip()):
+					print "\nINPUT: " + line.strip('\n')
+
+				if self.comment_counter == 0:
+					line_comment_loc = line.find("//")
+					if line_comment_loc != -1:
+						line = line[0:line_comment_loc]
 
 				for character in line:
 					result = self.parse(character)
@@ -79,19 +86,19 @@ class LexicalAnalyzer:
 		#elif re.match("\s", character) is not None:
 		elif re.search("[^A-Za-z0-9.E]+", cur_string):
 			if re.match("[A-Za-z]+$", cls.current_string) is not None:
-				token = "id"
+				token = "ID"
 				lexum = cls.current_string
 				cls.current_string = character if re.match("\s", character) is None else ""
 			elif re.match("[0-9]+$", cls.current_string):
-				token = "num"
+				token = "NUM"
 				lexum = cls.current_string
 				cls.current_string = character if re.match("\s", character) is None else ""
-			elif re.match("-?[0-9]+(\.[0-9]+)?E-?[0-9]+$", cls.current_string):
-				token = "float"
+			elif re.match("[+-]?[0-9]+(\.[0-9]+)?E[+-]?[0-9]+$", cls.current_string):
+				token = "FLOAT"
 				lexum = cls.current_string
 				cls.current_string = character if re.match("\s", character) is None else ""
 			elif len(cls.current_string) > 0:
-				print "ERROR: " + cls.current_string + " not in grammar"
+				print "ERROR: " + cls.current_string
 				cls.current_string = ""
 
 		if lexum == "/*":
@@ -99,7 +106,7 @@ class LexicalAnalyzer:
 			lexum = None
 			cur_string = ""
 			character = ""
-		elif lexum == "*/":
+		elif lexum == "*/" and cls.comment_counter > 0:
 			cls.comment_counter -= 1
 			lexum = None
 			cur_string = ""
