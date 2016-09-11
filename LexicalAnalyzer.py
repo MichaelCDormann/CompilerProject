@@ -83,23 +83,24 @@ class LexicalAnalyzer:
 			token = tokens[cls.current_string]
 			lexum = cls.current_string
 			cls.current_string = character if re.match("\s", character) is None else ""
-		#elif re.match("\s", character) is not None:
 		elif re.search("[^A-Za-z0-9.E]+", cur_string):
 			if re.match("[A-Za-z]+$", cls.current_string) is not None:
-				token = "ID"
+				token = "id"
 				lexum = cls.current_string
 				cls.current_string = character if re.match("\s", character) is None else ""
 			elif re.match("[0-9]+$", cls.current_string):
-				token = "NUM"
+				token = "num"
 				lexum = cls.current_string
 				cls.current_string = character if re.match("\s", character) is None else ""
 			elif re.match("[+-]?[0-9]+(\.[0-9]+)?E[+-]?[0-9]+$", cls.current_string):
-				token = "FLOAT"
+				token = "float"
 				lexum = cls.current_string
 				cls.current_string = character if re.match("\s", character) is None else ""
 			elif len(cls.current_string) > 0:
-				print "ERROR: " + cls.current_string
-				cls.current_string = ""
+				if character in tokens or re.match("\s", character):
+					print "ERROR: " + cls.current_string
+					cls.current_string = character if re.match("\s", character) is None else ""
+					cur_string = cls.current_string
 
 		if lexum == "/*":
 			cls.comment_counter += 1
