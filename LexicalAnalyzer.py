@@ -36,10 +36,12 @@ class LexicalAnalyzer:
 
 		with self.file.open() as f:
 			for line in f:
-				line = line.strip('\n') + " "
+
+				if re.match("\s", line[-1]) is None:
+					line = line + " "
 
 				if len(line.strip()):
-					print "\nINPUT: " + line.strip('\n')
+					print "\nINPUT: ", line.strip("\n")
 
 				if self.comment_counter == 0:
 					line_comment_loc = line.find("//")
@@ -83,7 +85,7 @@ class LexicalAnalyzer:
 			token = tokens[cls.current_string]
 			lexum = cls.current_string
 			cls.current_string = character if re.match("\s", character) is None else ""
-		elif re.search("[^A-Za-z0-9.E]+", cur_string):
+		elif re.search("[^A-Za-z]+", cur_string) and re.search("[^0-9.E+-]+", cur_string):
 			if re.match("[A-Za-z]+$", cls.current_string) is not None:
 				token = "id"
 				lexum = cls.current_string
@@ -126,7 +128,7 @@ class LexicalAnalyzer:
 			return None
 
 		if token is not None and lexum is not None:
-			print token + ": " + lexum
+			print "\t{0:10} \t{1}".format(token, lexum)
 			return (token, lexum, cls.scope_counter)
 		elif re.match("\s", character) is None:
 			cls.current_string = cur_string
