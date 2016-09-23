@@ -9,7 +9,7 @@ def reverse_token_dict():
 	global tokens_temp, tokens, token_keys
 	for key, values in tokens_temp.iteritems():
 		for value in values:
-		   tokens[value] = key
+			tokens[value] = key
 
 reverse_token_dict()
 
@@ -43,14 +43,17 @@ class LexicalAnalyzer:
 				if len(line.strip()):
 					print "\nINPUT: ", line.strip("\n")
 
-				if self.comment_counter == 0:
-					line_comment_loc = line.find("//")
-					if line_comment_loc != -1:
-						line = line[0:line_comment_loc]
+				#if self.comment_counter == 0:
+				#	line_comment_loc = line.find("//")
+				#	other_comment_loc = line.find("/*")
+				#	if line_comment_loc != -1 and ((other_comment_loc != -1) ^ (line_comment_loc < other_comment_loc)):
+				#		line = line[0:line_comment_loc]
 
 				for character in line:
 					result = self.parse(character)
 					if result is not None:
+						if result == "FlushLine":
+							break
 						token_lexum_tuple.append(result)
 
 		return token_lexum_tuple
@@ -75,12 +78,12 @@ class LexicalAnalyzer:
 		cur_string = cls.current_string + character
 
 		#if current_string + the new character is in tokens not a substring of another value in tokens
-		if cur_string in tokens and not cls.check_substring(cur_string):
+		if cur_string in tokens and not cls.check_substring(cur_string) and (re.search("[^A-Za-z]+", cur_string) or re.match("[A-Za-z]+", character) is None):
 			token = tokens[cur_string]
 			lexum = cur_string
 			cls.current_string = ""
 		#if current_string is in tokens (string without new character)
-		elif cls.current_string in tokens:
+		elif cls.current_string in tokens and (re.search("[^A-Za-z]+", cur_string) or re.match("[A-Za-z]+", character) is None):
 			#since character isn't being used in this lexum, add it to be used in the next(unless it's whitespace)
 			token = tokens[cls.current_string]
 			lexum = cls.current_string
@@ -94,7 +97,7 @@ class LexicalAnalyzer:
 				token = "num"
 				lexum = cls.current_string
 				cls.current_string = character if re.match("\s", character) is None else ""
-			elif re.match("[+-]?[0-9]+(\.[0-9]+)?E[+-]?[0-9]+$", cls.current_string):
+			elif re.match("[0-9]+(\.[0-9]+)?(E[+-]?[0-9]+)?$", cls.current_string):
 				token = "float"
 				lexum = cls.current_string
 				cls.current_string = character if re.match("\s", character) is None else ""
@@ -114,6 +117,8 @@ class LexicalAnalyzer:
 			lexum = None
 			cur_string = ""
 			character = ""
+		elif lexum == "//" and cls.comment_counter == 0:
+			return "FlushLine"
 		elif lexum == "{":
 			cls.scope_counter += 1
 		elif lexum == "}":
