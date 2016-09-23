@@ -133,7 +133,7 @@ class LexicalAnalyzer:
 			return None
 
 		if token is not None and lexum is not None:
-			print "\t{0:10} \t{1}".format(token, lexum)
+			print "\t{0:10} \t{1:10} \t{2}".format(token, lexum, cls.scope_counter)
 			return (token, lexum, cls.scope_counter)
 		elif re.match("\s", character) is None:
 			cls.current_string = cur_string
