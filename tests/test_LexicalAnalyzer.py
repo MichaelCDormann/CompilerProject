@@ -1,5 +1,7 @@
-from LexicalAnalyzer import *
 import io
+
+from LexicalAnalyzer.LexicalAnalyzer import *
+
 
 def test_reverse_token_dict():
     reversed_dict = {"else": "keyword", "if": "keyword", "int": "keyword", "return": "keyword", "void": "keyword", "while": "keyword", "float": "keyword",
