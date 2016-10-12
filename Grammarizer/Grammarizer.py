@@ -35,14 +35,16 @@ import collections
 ])"""
 
 
-terminals = ["a", "b", "c", "e", "f", "g", "empty"]
+terminals = ["a", "h", "b", "c", "g", "m", "d", "empty"]
 grammar = collections.OrderedDict([
-	("S",   ["A B C D E"]),
-	("A",   ["a b A", "a b", "c", "empty"]),
-	("B",   ["C a", "D g", "empty"]),
-	("C",   ["b"]),
-	("D",   ["e", "empty"]),
-	("E",   ["f"])
+	("S",   ["a X"]),
+	("X",   ["E Y"]),
+	("Y",   ["F B h", "b"]),
+	("B",   ["c C"]),
+	("C",   ["b C", "empty"]),
+	("E",   ["g", "empty"]),
+	("F",   ["m F'", "F'"]),
+	("F'",  ["d F'", "empty"])
 ])
 
 first = collections.OrderedDict({})
@@ -73,18 +75,96 @@ def get_first(expr):
 	if expr in terminals:
 		return set([expr])
 	else:
+		original_rule = expr
 		firsts = set()
 		expressions = grammar[expr]
 		for expr in expressions:
 			lexums = expr.split(" ")
 			firsts = firsts.union(get_first(lexums[0]))
 			index = 1
-			while "empty" in firsts and index < len(lexums):
+			while "empty" in firsts and index < len(lexums) and original_rule != lexums[index]:
 				firsts = firsts.difference(set(["empty"]))
 				firsts = firsts.union(get_first(lexums[index]))
 				index = index + 1
 
 		return firsts
 
+def calc_follow():
+	first_rule = grammar.keys()[0]
+	follow[first_rule] = set(["$"])
+
+	lexum_list = []
+	for expressions in grammar.itervalues():
+		for expr in expressions:
+			lexums = expr.split(" ")
+			if len(lexums) > 1:
+				lexum_list.append(lexums)
+
+	for lexums in lexum_list:
+		get_follow(lexums)
+
+	iterate = True
+	while iterate:
+		iterate = False
+		for rule, expressions in grammar.iteritems():
+			for expr in expressions:
+				lexums = expr.split(" ")
+				last_lexum = lexums[-1]
+
+				if last_lexum in terminals:
+					continue
+
+				if last_lexum in follow.keys():
+					if follow[last_lexum].intersection(follow[rule]) != follow[rule]:
+						follow[last_lexum] = follow[last_lexum].union(follow[rule])
+						iterate = True
+				else:
+					follow[last_lexum] = follow[rule]
+					iterate = True
+
+				for i in range(0, len(lexums)):
+					if "empty" not in first[last_lexum]:
+						break
+					last_lexum = lexums[lexums.index(last_lexum) - 1]
+					if last_lexum in terminals:
+						break
+					if last_lexum in follow.keys():
+						if follow[last_lexum].intersection(follow[rule]) != follow[rule]:
+							follow[last_lexum] = follow[last_lexum].union(follow[rule])
+							iterate = True
+					else:
+						follow[last_lexum] = follow[rule]
+						iterate = True
+
+def get_follow(lexums):
+	for i in range(0, len(lexums)):
+		if lexums[i] not in terminals:
+			follow_set = set()
+
+			try:
+				if lexums[i+1] in terminals:
+					follow_set.add(lexums[i+1])
+				else:
+					follow_set = follow_set.union(first[lexums[i+1]])
+					index = i + 1
+					while "empty" in follow_set and index < len(lexums):
+						follow_set = follow_set.difference(set(["empty"]))
+						if lexums[index + 1] in terminals:
+							follow_set = follow_set.add(lexums[index + 1])
+						else:
+							follow_set = follow_set.union(first[lexums[index + 1]])
+						index = index + 1
+
+					follow_set = follow_set.difference(set(["empty"]))
+
+				if lexums[i] in follow.keys():
+					follow[lexums[i]] = follow[lexums[i]].union(follow_set)
+				else:
+					follow[lexums[i]] = follow_set
+			except:
+				continue
+
 calc_first()
 print first
+calc_follow()
+print follow
