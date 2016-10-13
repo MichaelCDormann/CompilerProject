@@ -35,13 +35,13 @@ import collections
 ])"""
 
 
-terminals = ["a", "h", "b", "c", "g", "m", "d", "empty"]
+terminals = ["a", "g", "m", "d", "c", "b", "h", "empty"]
 grammar = collections.OrderedDict([
 	("S",   ["a X"]),
 	("X",   ["E Y"]),
 	("Y",   ["F B h", "b"]),
-	("B",   ["c C"]),
-	("C",   ["b C", "empty"]),
+	("B",   ["c G"]),
+	("G",   ["b G", "empty"]),
 	("E",   ["g", "empty"]),
 	("F",   ["m F'", "F'"]),
 	("F'",  ["d F'", "empty"])
@@ -161,7 +161,7 @@ def get_follow(lexums):
 					#otherwie get the first set of the next lexum and add it to the follow set
 					follow_set = follow_set.union(first[lexums[i+1]])
 					index = i + 1
-					while "empty" in follow_set and index < len(lexums):
+					while "empty" in follow_set and index < len(lexums) - 1:
 						#while there is an empty in the follow set get the first set of the next lexum as well
 						follow_set = follow_set.difference(set(["empty"]))
 						if lexums[index + 1] in terminals:
