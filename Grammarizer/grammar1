@@ -1,3 +1,6 @@
+
+#Grammarizer reads this file and ignores these comments. Terminals and grammar have to be declared as below:
+
 terminals = ["a", "h", "b", "c", "g", "m", "d", "empty"]
 
 S -> a X
