@@ -14,8 +14,9 @@ def read_grammar(filename):
 
 			if line == "":
 				continue
-
-			if line[0:9] == "terminals":
+			elif line[0] == "#":
+				continue
+			elif line[0:9] == "terminals":
 				line = "global terminals\n" + line
 				exec(line) #potentially really bad security flaw amoung other things, but for this project, who cares
 				continue
@@ -30,7 +31,7 @@ def read_grammar(filename):
 
 def print_sets(setdict):
 	for rule, ruleset in setdict.iteritems():
-		print "{0:3} =   {{{1}}}".format(rule, str(ruleset)[6:-3])
+		print "{0:3} =   {{{1}}}".format(rule, str(ruleset)[6:-3].replace("'", ""))
 
 def print_grammar():
 	for rule, expression in grammar.iteritems():

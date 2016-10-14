@@ -8,3 +8,14 @@ G -> b G | empty
 E -> g | empty
 F -> m F' | F'
 F' -> d F' | empty
+
+#Should output:
+#   First:                  Follow:
+#   S = {a}                 S = {$}
+#   X = {g, m, d, c, b}     X = {$}
+#   Y = {m, d, c, b}        Y = {$}
+#   B = {c}                 B = {h}
+#   G = {b, empty}          G = {h}
+#   E = {g, empty}          E = {m, d, c, b}
+#   F = {m, d, empty}       F = {c}
+#   F'= {d, empty}          F'= {c}
