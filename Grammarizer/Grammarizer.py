@@ -1,54 +1,36 @@
 import collections
+import sys
 
-#terminals = ["id", ";", "[", "]", "num", "int", "void", "float", "(", ")", ",", "{", "}", "if", "else", "while",
-#             "return", "=", "<=", "<", ">", ">=", "==", "!=", "+", "-", "*", "/"]
-"""grammar = collections.OrderedDict([
-	("program",              ["declaration-list"]),
-	("declaration-list",     ["declaration-list declaration", "declaration"]),
-	("declaration",          ["var-declaration", "fun-declaration"]),
-	("var-declaration",      ["type-specifier id ;", "type-specifier id [ num ] ;"]),
-	("type-specifier",       ["int", "void", "float"]),
-	("fun-declaration",      ["type-specifier id ( params ) compound-stmt"]),
-	("params",               ["param-list", "void"]),
-	("param-list",           ["param-list , param", "param"]),
-	("param",                ["type-specifier id", "type-specifier id [ ]"]),
-	("compound-stmt",        ["{ local-declarations statement-list }"]),
-	("local-declarations",   ["local-declarations var-declaration", "empty"]),
-	("statement-list",       ["statement-list statement", "empty"]),
-	("statement",            ["expression-stmt", "compound-stmt", "selection-stmt", "iteration-stmt", "return-stmt"]),
-	("expression-stmt",      ["expression ;", ";"]),
-	("selection-stmt",       ["if ( expression ) statement", "if ( expression ) statement else statement"]),
-	("iteration-stmt",       ["while ( expression ) statement"]),
-	("return-stmt",          ["return ;", "return expression ;"]),
-	("expression",           ["var = expression", "simple-expression"]),
-	("var",                  ["id", "id [ expression ]"]),
-	("simple-expression",    ["additive-expression relop additive-expression", "additive-expression"]),
-	("relop",                ["<=", "<", ">", ">=", "==", "!="]),
-	("additive-expression",  ["additive-expression addop term", "term"]),
-	("addop",                ["+", "-"]),
-	("term",                 ["term mulop factor", "factor"]),
-	("mulop",                ["*", "/"]),
-	("factor",               ["( expression )", "var", "call", "num", "float"]),
-	("call",                 ["id ( args )"]),
-	("args",                 ["arg-list", "empty"]),
-	("arg-list",             ["arg-list , expression", "expression"])
-])"""
-
-
-terminals = ["a", "g", "m", "d", "c", "b", "h", "empty"]
-grammar = collections.OrderedDict([
-	("S",   ["a X"]),
-	("X",   ["E Y"]),
-	("Y",   ["F B h", "b"]),
-	("B",   ["c G"]),
-	("G",   ["b G", "empty"]),
-	("E",   ["g", "empty"]),
-	("F",   ["m F'", "F'"]),
-	("F'",  ["d F'", "empty"])
-])
-
+terminals = []
+grammar = collections.OrderedDict({})
 first = collections.OrderedDict({})
 follow = collections.OrderedDict({})
+
+def read_grammar(filename):
+	with open(filename, 'r') as grmrfile:
+
+		for line in grmrfile:
+			line = line.strip()
+
+			if line == "":
+				continue
+
+			if line[0:9] == "terminals":
+				line = "global terminals\n" + line
+				exec(line) #potentially really bad security flaw amoung other things, but for this project, who cares
+				continue
+
+			rule, productions = line.split("->")
+			rule = rule.strip()
+			grammar[rule] = []
+			productions = productions.split("|")
+			for production in productions:
+				production = production.strip()
+				grammar[rule].append(production)
+
+def print_sets(setdict):
+	for rule, ruleset in setdict.iteritems():
+		print "{0:3} =   {{{1}}}".format(rule, str(ruleset)[6:-3])
 
 def print_grammar():
 	for rule, expression in grammar.iteritems():
@@ -179,7 +161,10 @@ def get_follow(lexums):
 			except:
 				continue
 
+read_grammar(sys.argv[1])
 calc_first()
-print first
+print "___First___"
+print_sets(first)
 calc_follow()
-print follow
+print "\n___Follow___"
+print_sets(follow)

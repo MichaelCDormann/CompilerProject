@@ -1,0 +1,10 @@
+terminals = ["a", "h", "b", "c", "g", "m", "d", "empty"]
+
+S -> a X
+X -> E Y
+Y -> F B h | b
+B -> c G
+G -> b G | empty
+E -> g | empty
+F -> m F' | F'
+F' -> d F' | empty
