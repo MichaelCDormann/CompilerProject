@@ -12,6 +12,7 @@ params_lf           ->  id param param_lf param-list_prime | empty
 param-list_prime    ->  , param param-list_prime | empty
 param               ->  int id param_lf | void id param_lf | float id param_lf
 param_lf            ->  [ ] | empty
+#LL(2) param_lf because follow(param_lf) = {) [ ,}
 compound-stmt       ->  { local-declarations statement-list }
 local-declarations  ->  int dec_lf local-declarations | void dec_lf local-declarations | float dec_lf local-declarations | empty
 statement-list      ->  statement statement-list | empty
@@ -23,7 +24,6 @@ iteration-stmt      ->  while ( expression ) statement
 return-stmt         ->  return ret-stmt_lf
 ret-stmt_lf         ->  ; | expression ;
 expression          ->  id expr_lf | ( expression ) term_prime add-expr_prime sim-exp_lf | num term_prime add-expr_prime sim-exp_lf | float_num term_prime add-expr_prime sim-exp_lf
-#expr_lf             ->   var_lf = expression |  var_lf term_prime add-expr_prime sim-exp_lf | ( args ) term_prime add-expr_prime sim-exp_lf
 expr_lf             ->  var_lf expr_lf_lf | ( args ) term_prime add-expr_prime sim-exp_lf
 expr_lf_lf          ->  = expression | term_prime add-expr_prime sim-exp_lf
 var_lf              ->  [ expression ] | empty
