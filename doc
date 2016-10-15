@@ -1,0 +1,19 @@
+# COP 4620 - Construction of Language Translators
+
+**Project 2 - Syntactic Analyzer**
+Michael Dormann
+N00958758
+
+Dr. Roger Eggen
+Due 10/20/16 Thursday, 11:59 PM
+
+### Project Scope
+
+ 
+### General Design
+
+
+### How to Run
+
+* Obtain(somehow) a source file for a program written C-
+* Run the Syntactic Analyzer with the command `./p2 [source file name]`
