@@ -31,7 +31,7 @@ def read_grammar(filename):
 
 def print_sets(setdict):
 	for rule, ruleset in setdict.iteritems():
-		print "{0:3} =   {{{1}}}".format(rule, str(ruleset)[6:-3].replace("'", ""))
+		print "{0:20} =   {{{1}}}".format(rule, str(ruleset)[6:-3].replace("'", ""))
 
 def print_grammar():
 	for rule, expression in grammar.iteritems():
@@ -112,12 +112,12 @@ def calc_follow():
 						# if the follow of the right rule isn't in the follow of the left production
 						follow[last_lexum] = follow[last_lexum].union(follow[rule])
 						iterate = True
-				else:
+				elif last_lexum != rule:
 					follow[last_lexum] = follow[rule]
 					iterate = True
 
 				#go through the remaining rules, right to left, to account for emptys
-				for i in range(len(lexums)-1, 0, -1):
+				for i in range(len(lexums)-1, -1, -1):
 					if "empty" not in first[last_lexum]:
 						break
 					last_lexum = lexums[i]
@@ -127,7 +127,7 @@ def calc_follow():
 						if follow[last_lexum].intersection(follow[rule]) != follow[rule]:
 							follow[last_lexum] = follow[last_lexum].union(follow[rule])
 							iterate = True
-					else:
+					elif last_lexum != rule:
 						follow[last_lexum] = follow[rule]
 						iterate = True
 
@@ -148,7 +148,7 @@ def get_follow(lexums):
 						#while there is an empty in the follow set get the first set of the next lexum as well
 						follow_set = follow_set.difference(set(["empty"]))
 						if lexums[index + 1] in terminals:
-							follow_set = follow_set.add(lexums[index + 1])
+							follow_set.add(lexums[index + 1])
 						else:
 							follow_set = follow_set.union(first[lexums[index + 1]])
 						index = index + 1

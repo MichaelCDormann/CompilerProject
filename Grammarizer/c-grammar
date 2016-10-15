@@ -1,0 +1,42 @@
+terminals = ["id", ";", "[", "]", "num", "int", "void", "float", "float_num", "(", ")", ",", "{", "}", "if", "else", "while", "return", "=", "<=", "<", ">", ">=", "==", "!=", "+", "-", "*", "/", "empty"]
+
+program             ->  declaration-list
+declaration-list    ->  declaration dec-list_prime
+dec-list_prime      ->  declaration dec-list_prime | empty
+declaration         ->  var-declaration | fun-declaration
+var-declaration     ->  type-specifier id var-dec_lf
+var-dec_lf          ->  ; | [ num ] ;
+type-specifier      ->  int | void | float
+fun-declaration     ->  type-specifier id ( params ) compound-stmt
+params              ->  param-list | void
+param-list          ->  param param-list_prime
+param-list_prime    ->  , param param-list_prime | empty
+param               ->  type-specifier id param_lf
+param_lf            ->  [ ] | empty
+compound-stmt       ->  { local-declarations statement-list }
+local-declarations  ->  var-declaration local-declarations | empty
+statement-list      ->  statement statement-list | empty
+statement           ->  expression-stmt | compound-stmt | selection-stmt | iteration-stmt | return-stmt
+expression-stmt     ->  expression ; | ;
+selection-stmt      ->  if ( expression ) statement sel-stmt_lf
+sel-stmt_lf         ->  else statement | empty
+iteration-stmt      ->  while ( expression ) statement
+return-stmt         ->  return ret-stmt_lf
+ret-stmt_lf         ->  ; | expression ;
+expression          ->  var = expression | simple-expression
+var                 ->  id var_lf
+var_lf              ->  [ expression ] | empty
+simple-expression   ->  additive-expression sim-exp_lf
+sim-exp_lf          ->  relop additive-expression | empty
+relop               ->  <= | < | > | >= | == | !=
+additive-expression ->  term add-expr_prime
+add-expr_prime      ->  addop term add-expr_prime | empty
+addop               ->  + | -
+term                ->  factor term_prime
+term_prime          ->  mulop factor term_prime | empty
+mulop               ->  * | /
+factor              ->  ( expression ) | var | call | num | float_num
+call                ->  id ( args )
+args                ->  arg-list | empty
+arg-list            ->  expression arg-list_prime
+arg-list_prime      ->  , expression arg-list_prime | empty
