@@ -107,6 +107,9 @@ def calc_follow():
 				if last_lexum in terminals:
 					continue
 
+				if last_lexum == "param-list" or rule == "param-list":
+					print "here"
+
 				if last_lexum in follow.keys():
 					if follow[last_lexum].intersection(follow[rule]) != follow[rule]:
 						# if the follow of the right rule isn't in the follow of the left production
@@ -135,6 +138,9 @@ def get_follow(lexums):
 	for i in range(0, len(lexums)):
 		if lexums[i] not in terminals:
 			follow_set = set()
+
+			if lexums[i] == "param-list":
+				print "here"
 
 			try:
 				#figure out what to do with the next lexum - if it's a terminal add it to the follow set
