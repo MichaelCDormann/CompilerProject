@@ -2,8 +2,12 @@
 
 import sys
 from LexicalAnalyzer.LexicalAnalyzer import *
+from SyntaxAnalyzer import *
 
 fl = FileAccessManager(sys.argv[1])
 analyzer = LexicalAnalyzer(fl)
 result = analyzer.analyze()
+
+syntaxer = SyntaxAnalyzer(result)
+syntaxer.Run()
 

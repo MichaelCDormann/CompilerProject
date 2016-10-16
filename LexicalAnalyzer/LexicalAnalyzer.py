@@ -40,8 +40,8 @@ class LexicalAnalyzer:
 				if re.match("\s", line[-1]) is None:
 					line = line + " "
 
-				if len(line.strip()):
-					print "\nINPUT: ", line.strip("\n")
+				#if len(line.strip()):
+				#	print "\nINPUT: ", line.strip("\n")
 
 				#if self.comment_counter == 0:
 				#	line_comment_loc = line.find("//")
@@ -79,14 +79,14 @@ class LexicalAnalyzer:
 
 		#if current_string + the new character is in tokens not a substring of another value in tokens
 		if cur_string in tokens and not cls.check_substring(cur_string) and (re.search("[^A-Za-z]+", cur_string) or re.match("[A-Za-z]+", character) is None):
-			token = tokens[cur_string]
-			lexum = cur_string
+			lexum = tokens[cur_string]
+			token = cur_string
 			cls.current_string = ""
 		#if current_string is in tokens (string without new character)
 		elif cls.current_string in tokens and (re.search("[^A-Za-z]+", cur_string) or re.match("[A-Za-z]+", character) is None):
 			#since character isn't being used in this lexum, add it to be used in the next(unless it's whitespace)
-			token = tokens[cls.current_string]
-			lexum = cls.current_string
+			lexum = tokens[cls.current_string]
+			token = cls.current_string
 			cls.current_string = character if re.match("\s", character) is None else ""
 		elif re.search("[^A-Za-z]+", cur_string) and re.search("[^0-9.E+-]+", cur_string):
 			if re.match("[A-Za-z]+$", cls.current_string) is not None:
@@ -133,7 +133,7 @@ class LexicalAnalyzer:
 			return None
 
 		if token is not None and lexum is not None:
-			print "\t{0:10} \t{1:10} \t{2}".format(token, lexum, cls.scope_counter)
+			#print "\t{0:10} \t{1:10} \t{2}".format(token, lexum, cls.scope_counter)
 			return (token, lexum, cls.scope_counter)
 		elif re.match("\s", character) is None:
 			cls.current_string = cur_string
