@@ -1,1 +1,3 @@
-int test
+int test ;
+float blah [ 30 ];
+void testfun ( int blah )
