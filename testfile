@@ -1,3 +1,6 @@
 int test ;
 float blah [ 30 ];
-void testfun ( int blah )
+void testfun ( void testt[], int num[ ] ) {
+    int depthtwo[100] ;
+    ;
+}
