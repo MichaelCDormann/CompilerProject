@@ -1,0 +1,10 @@
+/*  test23 number in ID token */
+
+int gc1d ( int u , int v )
+{	// note prob here
+	if ( v == 0 )
+		return u ;
+	else
+		return gcd ( v , u - u / v * v );
+	/* note u-(u/v*v) = u mod v */
+}

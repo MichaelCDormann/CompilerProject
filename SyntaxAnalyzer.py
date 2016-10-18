@@ -111,12 +111,14 @@ class SyntaxAnalyzer(object):
 			self.getParams = False
 
 	def Run(self):
-		#try:
-		#	self.program()
-		#	print "ACCEPT"
-		#except RejectException:
-		#	print "REJECT"
-		self.program()
+		try:
+			self.program()
+			#print "ACCEPT"
+			return "ACCEPT"
+		except RejectException:
+			#print "REJECT"
+			return "REJECT"
+		#self.program()
 
 	#---------------------------------------
 	# These methods actually do the parsing
@@ -171,21 +173,18 @@ class SyntaxAnalyzer(object):
 			elif self.curToken == ";":
 				self.Accept()
 			else:
-				raise RejectException("Next token was '" + self.curToken + "' was expecting '[' or ';'")
+				raise RejectException("Next token was '" + self.curToken + "' was expecting '['")
 			self.InsertST()
-
 		elif self.curToken == "(":
 			self.Accept()
 			self.getParams = True
 			self.params()
-
 			if self.curToken == ")":
 				self.InsertST()
 				self.Accept()
 				self.compoundstmt()
 			else:
 				raise RejectException("Next token was '" + self.curToken + "' was expecting ')'")
-
 		else:
 			raise RejectException("Next token was '" + self.curToken + "' was expecting ';', '[', or '('")
 
@@ -458,6 +457,93 @@ class SyntaxAnalyzer(object):
 			self.Accept()
 		else:
 			raise RejectException("Next token was '" + self.curToken + "' was expecting '<=', '<', '>', '>=', '==', or '!='")
+
+	def addexpr_prime(self):
+		pass
+
+	def addop(self):
+		if self.curToken in ["+", "-"]:
+			self.Accept()
+		else:
+			raise RejectException("Next token was '" + self.curToken + "' was expecting '+', or '-'")
+
+	def term(self):
+		if self.curToken in ["(", "num", "id", "float_num"]:
+			self.factor()
+			self.term_prime()
+		else:
+			raise RejectException("Next token was '" + self.curToken + "' was expecting '(', 'num', 'id', 'float_num'")
+
+	def term_prime(self):
+		if self.curToken in ["*", "/"]:
+			self.mulop()
+			self.factor()
+			self.term_prime()
+		elif self.curToken in [">=", "==", "]", "+", "<=", "-", ",", ")", ";", "!=", "<", ">"]:
+			pass
+		else:
+			raise RejectException(
+				"Next token was '" + self.curToken + "' was expecting '*', '/', '>=', '==', ']', '+', '<=', '-', ',', ')', "
+				                                     "';', '!=', '<', or '>'")
+
+	def mulop(self):
+		if self.curToken in ["*", "/"]:
+			self.Accept()
+		else:
+			raise RejectException("Next token was '" + self.curToken + "' was expecting '*' or '/'")
+
+	def factor(self):
+		if self.curToken == "(":
+			self.Accept()
+			self.expression()
+			if self.curToken == ")":
+				self.Accept()
+			else:
+				raise RejectException("Next token was '" + self.curToken + "' was expecting ')'")
+		elif self.curToken == "id":
+			self.Accept()
+			self.factor_lf()
+		elif self.curToken in ["num", "float_num"]:
+			self.Accept()
+		else:
+			raise RejectException("Next token was '" + self.curToken + "' was expecting '(', 'id', 'num' or 'float_num'")
+
+	def factor_lf(self):
+		if self.curToken in ["[", "<=", ">=", "==", "!=", "+", "*", "-", ",", "/", ")", ";", "]", "<", ">"]:
+			self.var_lf()
+		elif self.curToken == "(":
+			self.Accept()
+			self.args()
+			if self.curToken == ")":
+				self.Accept()
+			else:
+				raise RejectException("Next token was '" + self.curToken + "' was expecting ')'")
+		else:
+			raise RejectException(
+				"Next token was '" + self.curToken + "' was expecting '(', '[', '<=', '>=', '==', '!=', '+', '*', '-', "
+				                                     "',', '/', ')', ';', ']', '<', or '>'")
+
+	def args(self):
+		if self.curToken in ["(", "num", "id", "float_num"]:
+			self.arglist()
+		elif self.curToken == ")":
+			pass
+		else:
+			raise RejectException("Next token was '" + self.curToken + "' was expecting '(', 'id', 'num' or 'float_num'")
+
+	def arglist(self):
+		self.expression()
+		self.arglist_prime()
+
+	def arglist_prime(self):
+		if self.curToken == ",":
+			self.Accept()
+			self.expression()
+			self.arglist_prime()
+		elif self.curToken == ")":
+			pass
+		else:
+			raise RejectException("Next token was '" + self.curToken + "' was expecting ',' or ')'")
 
 
 class RejectException(Exception):

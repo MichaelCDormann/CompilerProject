@@ -1,0 +1,14 @@
+/* test53  testing excess letter in array reference fail*/
+
+int z[6];
+
+int noclue(int z[])
+{
+	int s;
+	if(z[1a] >= 7)		// 1a is token 22
+		return z;
+	while(r>z)
+	{if (x==2)
+			return x;
+	}
+}

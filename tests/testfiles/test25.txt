@@ -1,0 +1,15 @@
+/*  test25 int u exists twice, scope test, should pass */
+
+
+int u;   // note "int u=0;" here is a fail in C-
+
+int gcd ( int u , int v )
+{	
+	if ( v == 0 )
+		return u ;
+	else
+		return gcd ( v , u - u / v * v );
+	/* note u-(u/v*v) = u mod v */
+
+	return v;
+}

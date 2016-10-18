@@ -103,7 +103,7 @@ class LexicalAnalyzer:
 				cls.current_string = character if re.match("\s", character) is None else ""
 			elif len(cls.current_string) > 0:
 				if character in tokens or re.match("\s", character):
-					print "ERROR: " + cls.current_string
+					#print "ERROR: " + cls.current_string
 					cls.current_string = character if re.match("\s", character) is None else ""
 					cur_string = cls.current_string
 

@@ -1,0 +1,15 @@
+/* test3  testing <=, <,>,>= accept*/
+
+int gcd (int u , int v )
+{
+	if ( v <= 0)
+		return u;
+	else
+		return gcd( v , u - u / v* v );
+	/*note u-(u/v*v) == u mod v */
+
+	if ( x >= 1)
+		return y;
+	if (x==2)
+		return 3;
+}

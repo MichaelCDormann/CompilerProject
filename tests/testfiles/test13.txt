@@ -1,0 +1,16 @@
+/* test13  testing void list accept*/
+
+float z;
+
+void noclue(void)
+{
+	int s;
+	if(z=7)
+		return z;
+	while(r>z)
+	{if (x==2)
+			return x;
+	}
+
+
+}

@@ -1,0 +1,16 @@
+/* test52  testing if comparison extra < fail*/
+
+int z[6];
+
+int noclue(int z[])
+{
+	int s;
+	if(z[1] <<= 7)		// <<= is tokens 24&25
+		return z;
+	while(r>z)
+	{if (x==2)
+			return x;
+	}
+
+
+}

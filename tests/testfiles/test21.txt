@@ -1,0 +1,17 @@
+/* test21  testing float accept*/
+
+int q[6];
+
+int noclue(int z[])
+{
+	int s;
+	if(z[1]=7)
+		return z;
+	while(r>z)
+	{
+		if (x==2)
+			return 3.4E-6;
+	}
+
+
+}

@@ -1,0 +1,19 @@
+/* test22  prog from book */
+
+int x[10];
+
+int minloc(int a[], int low, int high)
+{ int z; int x; int k;
+	k=low;
+	x =a[low];
+	z=low +1;
+	while (z<high)
+	{ if (a[z]<x)
+		{ x=a[z];
+			k=i;
+	 
+		}
+		z=z+1;
+	}
+	return k;
+}

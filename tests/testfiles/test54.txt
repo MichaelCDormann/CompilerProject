@@ -1,0 +1,36 @@
+/* test54  testing float accept*/
+
+int q[6];
+
+int noclue(int z[])
+{
+	int s;
+	if(z[1]=7)
+		return z;
+	while(r>z)
+	{
+		if (x==2)
+			return 3.4E-6;
+	}
+	
+	if(a>b){
+	k = k;
+	}else{
+	k = 1;
+	}
+	
+	if(b>a)
+	b = 1;
+	else
+	b = 2;
+	
+	if(b == a)
+	a = b;
+	else{
+	c = d;
+	}
+	
+	
+	
+
+}

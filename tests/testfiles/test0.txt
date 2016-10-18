@@ -1,0 +1,7 @@
+/* a simple test1 accept*/
+
+int hello ( int i )
+{
+	if ( i == 0 )
+		return ;
+}

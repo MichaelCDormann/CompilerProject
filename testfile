@@ -1,13 +1,6 @@
-int test ;
-float blah [ 30 ];
-void testfun ( void testt[], int num[ ] ) {
-    int depthtwo[100] ;
-    if ( blah ) {
-        return blah;
-        while ( true ) {
-            int blahblah;
-            float blahbhte;
-            return;
-        }
+
+void testfun ( void testt[] ) {
+    if ( i == 0 ) {
+        return ;
     }
 }
