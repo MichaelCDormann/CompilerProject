@@ -22,6 +22,7 @@ class SymbolTable(object):
 	@classmethod
 	def IncrementDepth(cls):
 		cls.depth += 1
+		cls.dict_list.append({})
 
 	@classmethod
 	def GetItem(cls, name, depth=None):
@@ -337,8 +338,127 @@ class SyntaxAnalyzer(object):
 				"Next token was '" + self.curToken + "' was expecting 'return', '(', 'else', 'while', 'num', 'float_num', "
 				                                     "'{', ';', '}', 'id', and 'if'")
 
+	def iterationstmt(self):
+		if self.curToken == "while":
+			self.Accept()
+			if self.curToken == "(":
+				self.Accept()
+				self.expression()
+				if self.curToken == ")":
+					self.Accept()
+					self.statement()
+				else:
+					raise RejectException("Next token was '" + self.curToken + "' was expecting ')'")
+			else:
+				raise RejectException("Next token was '" + self.curToken + "' was expecting '('")
+		else:
+			raise RejectException("Next token was '" + self.curToken + "' was expecting 'while'")
+
+	def returnstmt(self):
+		if self.curToken == "return":
+			self.Accept()
+			self.retstmt_lf()
+		else:
+			raise RejectException("Next token was '" + self.curToken + "' was expecting 'return'")
+
+	def retstmt_lf(self):
+		if self.curToken == ";":
+			self.Accept()
+		elif self.curToken in ["(", "num", "id", "float_num"]:
+			self.expression()
+			if self.curToken == ";":
+				self.Accept()
+			else:
+				raise RejectException("Next token was '" + self.curToken + "' was expecting ';'")
+		else:
+			raise RejectException("Next token was '" + self.curToken + "' was expecting ';', '(', 'id', 'num', or 'float_num'")
+
 	def expression(self):
-		self.Accept()
+		if self.curToken == "id":
+			self.Accept()
+			self.expr_lf()
+		elif self.curToken == "(":
+			self.Accept()
+			self.expression()
+			if self.curToken == ")":
+				self.Accept()
+				self.term_prime()
+				self.addexpr_prime()
+				self.simpexpr_lf()
+			else:
+				raise RejectException("Next token was '" + self.curToken + "' was expecting ')'")
+		elif self.curToken in ["num", "float_num"]:
+			self.Accept()
+			self.term_prime()
+			self.addexpr_prime()
+			self.simpexpr_lf()
+		else:
+			raise RejectException("Next token was '" + self.curToken + "' was expecting 'id', '(', 'num', or 'float_num'")
+
+	def expr_lf(self):
+		if self.curToken in ["[", "<=", ">=", "==", "!=", "+", "*", "-", "/", "=", "<", ">", ")", ";", "]", ","]:
+			self.var_lf()
+			self.expr_lf_lf()
+		elif self.curToken == "(":
+			self.Accept()
+			self.args()
+			if self.curToken == ")":
+				self.Accept()
+				self.term_prime()
+				self.addexpr_prime()
+				self.simpexpr_lf()
+			else:
+				raise RejectException("Next token was '" + self.curToken + "' was expecting ')'")
+		else:
+			raise RejectException(
+				"Next token was '" + self.curToken + "' was expecting '[', '<=', '>=', '==', '!=', '+', '*', '-', '/', "
+				                                     "'=', '<', '>', ')', ';', ']', ',', or '('")
+
+	def expr_lf_lf(self):
+		if self.curToken == "=":
+			self.Accept()
+			self.expression()
+		elif self.curToken in ["*", "/", "+", "-", ">=", "==", "<=", "!=", "<", ">", ")", ";", "]", ","]:
+			self.term_prime()
+			self.addexpr_prime()
+			self.simpexpr_lf()
+		else:
+			raise RejectException(
+				"Next token was '" + self.curToken + "' was expecting '*', '/', '+', '-', '>=', '==', '<=', '!=', '<', "
+				                                     "'>', ')', ';', ']', ',', or '='")
+
+	def var_lf(self):
+		if self.curToken == "[":
+			self.Accept()
+			self.expression()
+			if self.curToken == "]":
+				self.Accept()
+			else:
+				raise RejectException("Next token was '" + self.curToken + "' was expecting ']'")
+		elif self.curToken in ["*", ">=", "]", "==", "=", "+", "<=", "-", ",", "/", ")", ";", "!=", "<", ">"]:
+			pass
+		else:
+			raise RejectException(
+				"Next token was '" + self.curToken + "' was expecting '[', '<=', '>=', '==', '!=', '+', '*', '-', '/', "
+				                                     "'=', '<', '>', ')', ';', ']', or ','")
+
+	def simpexpr_lf(self):
+		if self.curToken in [">=", "==", "<=", "!=", "<", ">"]:
+			self.relop()
+			self.term()
+			self.addexpr_prime()
+		elif self.curToken in [")", ";", "]", ","]:
+			pass
+		else:
+			raise RejectException(
+				"Next token was '" + self.curToken + "' was expecting '>=', '==', '<=', '!=', '<', '>', ')', ';', ']', or ','")
+
+	def relop(self):
+		if self.curToken in ["<=", "<", ">", ">=", "==", "!="]:
+			self.Accept()
+		else:
+			raise RejectException("Next token was '" + self.curToken + "' was expecting '<=', '<', '>', '>=', '==', or '!='")
+
 
 class RejectException(Exception):
 	def __init__(self,*args,**kwargs):
