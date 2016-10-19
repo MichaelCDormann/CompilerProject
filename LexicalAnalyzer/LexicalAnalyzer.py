@@ -98,7 +98,7 @@ class LexicalAnalyzer:
 				lexum = cls.current_string
 				cls.current_string = character if re.match("\s", character) is None else ""
 			elif re.match("[0-9]+(\.[0-9]+)?(E[+-]?[0-9]+)?$", cls.current_string):
-				token = "float"
+				token = "float_num"
 				lexum = cls.current_string
 				cls.current_string = character if re.match("\s", character) is None else ""
 			elif len(cls.current_string) > 0:
@@ -107,21 +107,21 @@ class LexicalAnalyzer:
 					cls.current_string = character if re.match("\s", character) is None else ""
 					cur_string = cls.current_string
 
-		if lexum == "/*":
+		if token == "/*":
 			cls.comment_counter += 1
 			lexum = None
 			cur_string = ""
 			character = ""
-		elif lexum == "*/" and cls.comment_counter > 0:
+		elif token == "*/" and cls.comment_counter > 0:
 			cls.comment_counter -= 1
 			lexum = None
 			cur_string = ""
 			character = ""
-		elif lexum == "//" and cls.comment_counter == 0:
+		elif token == "//" and cls.comment_counter == 0:
 			return "FlushLine"
-		elif lexum == "{":
+		elif token == "{":
 			cls.scope_counter += 1
-		elif lexum == "}":
+		elif token == "}":
 			cls.scope_counter -= 1
 
 		#inside a comment

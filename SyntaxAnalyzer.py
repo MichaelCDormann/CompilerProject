@@ -459,7 +459,16 @@ class SyntaxAnalyzer(object):
 			raise RejectException("Next token was '" + self.curToken + "' was expecting '<=', '<', '>', '>=', '==', or '!='")
 
 	def addexpr_prime(self):
-		pass
+		if self.curToken in ["+", "-"]:
+			self.addop()
+			self.term()
+			self.addexpr_prime()
+		elif self.curToken in [")", ",", ">=", "==", "]", ";", "<=", "!=", "<", ">"]:
+			pass
+		else:
+			raise RejectException(
+				"Next token was '" + self.curToken + "' was expecting '+', '-', '<=', '<', '>', '>=', '==', '!=', ')', "
+				                                     "',', ']', or ';'")
 
 	def addop(self):
 		if self.curToken in ["+", "-"]:

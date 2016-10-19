@@ -1,15 +1,1 @@
-{
-  "test_SyntaxAnalyzer.py::test_syntaxanalyzer[./testfiles/test0.txt-ACCEPT]": true, 
-  "test_SyntaxAnalyzer.py::test_syntaxanalyzer[./testfiles/test1.txt-ACCEPT]": true, 
-  "test_SyntaxAnalyzer.py::test_syntaxanalyzer[./testfiles/test10.txt-ACCEPT]": true, 
-  "test_SyntaxAnalyzer.py::test_syntaxanalyzer[./testfiles/test11.txt-ACCEPT]": true, 
-  "test_SyntaxAnalyzer.py::test_syntaxanalyzer[./testfiles/test12.txt-ACCEPT]": true, 
-  "test_SyntaxAnalyzer.py::test_syntaxanalyzer[./testfiles/test13.txt-ACCEPT]": true, 
-  "test_SyntaxAnalyzer.py::test_syntaxanalyzer[./testfiles/test14.txt-ACCEPT]": true, 
-  "test_SyntaxAnalyzer.py::test_syntaxanalyzer[./testfiles/test15.txt-ACCEPT]": true, 
-  "test_SyntaxAnalyzer.py::test_syntaxanalyzer[./testfiles/test2.txt-ACCEPT]": true, 
-  "test_SyntaxAnalyzer.py::test_syntaxanalyzer[./testfiles/test21.txt-ACCEPT]": true, 
-  "test_SyntaxAnalyzer.py::test_syntaxanalyzer[./testfiles/test3.txt-ACCEPT]": true, 
-  "test_SyntaxAnalyzer.py::test_syntaxanalyzer[./testfiles/test54.txt-ACCEPT]": true, 
-  "test_SyntaxAnalyzer.py::test_syntaxanalyzer[./testfiles/test9.txt-ACCEPT]": true
-}
+{}

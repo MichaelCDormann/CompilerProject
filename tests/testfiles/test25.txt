@@ -1,4 +1,4 @@
-/*  test25 int u exists twice, scope test, should pass */
+/*  test25 int u exists twice, scope test, accept */
 
 
 int u;   // note "int u=0;" here is a fail in C-

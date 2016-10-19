@@ -1,4 +1,4 @@
-/* test22  prog from book */
+/* test22  prog from book, accept*/
 
 int x[10];
 
