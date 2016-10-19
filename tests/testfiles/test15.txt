@@ -1,4 +1,4 @@
-/* test15  testing array parameter accept*/
+/* test15  misspelled else*/
 
 int q[6];
 
@@ -10,6 +10,8 @@ int noclue(int z[])
 	while(r>z)
 	{if (x==2)
 			return x;
+	els
+	        return y;
 	}
 
 
