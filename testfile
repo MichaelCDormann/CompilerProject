@@ -1,6 +1,0 @@
-
-void testfun ( void testt[] ) {
-    if ( i == 0 ) {
-        return ;
-    }
-}
