@@ -40,14 +40,26 @@ class LexicalAnalyzer:
 				if re.match("\s", line[-1]) is None:
 					line = line + " "
 
-				#if len(line.strip()):
-				#	print "\nINPUT: ", line.strip("\n")
+				# hotfix for a bug with lines like a[2+1] not getting turned into tokens 2 + 1
+				# If there is a plus in the line
+				if line.find("+") != -1:
+					q = re.search("[0-9]+(\.[0-9]+)?(E[+-]?[0-9]+)", line)
+					# If that plus is not part of a float
+					if q is not None:
+						if q.group().find("+") == -1:
+							line = line.replace("+", " + ")
+					else:
+						line = line.replace("+", " + ")
 
-				#if self.comment_counter == 0:
-				#	line_comment_loc = line.find("//")
-				#	other_comment_loc = line.find("/*")
-				#	if line_comment_loc != -1 and ((other_comment_loc != -1) ^ (line_comment_loc < other_comment_loc)):
-				#		line = line[0:line_comment_loc]
+				# If there is a minus in the line
+				if line.find("-") != -1:
+					q = re.search("[0-9]+(\.[0-9]+)?(E[+-]?[0-9]+)", line)
+					# If that minus is not part of a float
+					if q is not None:
+						if q.group().find("-") == -1:
+							line = line.replace("-", " - ")
+					else:
+						line = line.replace("-", " - ")
 
 				for character in line:
 					result = self.parse(character)

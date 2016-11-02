@@ -113,10 +113,8 @@ class SyntaxAnalyzer(object):
 	def Run(self):
 		try:
 			self.program()
-			#print "ACCEPT"
 			return "ACCEPT"
 		except RejectException:
-			#print "REJECT"
 			return "REJECT"
 		#self.program()
 
