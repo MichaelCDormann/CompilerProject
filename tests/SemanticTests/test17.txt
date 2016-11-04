@@ -1,0 +1,22 @@
+
+/* test for basic funtionality of proj 3 - should fail */
+/* test 17  test for no return  */
+
+int x;
+int y;
+
+void main ( int x, int y )
+{
+	int z;
+	
+	z = x + y;
+
+}
+
+int my ( float b, int u)
+{
+
+	int z;
+
+	z = z+y;
+}

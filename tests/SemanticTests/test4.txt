@@ -1,0 +1,29 @@
+
+/* test for basic functionality of proj 3 - pass */
+/* test 4 - 2 methods, scope check in depth */
+
+int x;
+int y;
+
+void main ( int x, int y )
+{
+	int z;
+	x=1;
+	y=2;
+	z = x + y;
+	if (z < 5)
+	{
+		z=10;
+	
+	}
+
+}
+
+int my ( float b, int u)
+{
+	int z;
+	
+	z = z+y;
+
+	return z;
+}

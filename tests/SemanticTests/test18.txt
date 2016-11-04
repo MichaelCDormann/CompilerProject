@@ -1,0 +1,38 @@
+
+/* test for basic functionality of proj 3 - fail */
+/* test 18 - test declaring variable twice */
+
+int x;
+int y;
+
+void my (void)
+{
+	int z;
+
+	int z;
+
+}
+
+void main( int x, int y )
+{
+	int z;
+	x=1;
+	y=2;
+	z = x + y;
+	if (z < 5)
+	{
+		z=my(1.2, 2.5);
+	
+	}
+
+}
+
+int something( int z, int q)
+{
+	int why;
+
+	why = z+q;
+
+	return why;
+
+}

@@ -1,0 +1,44 @@
+
+/* test for basic functionality of proj 3 - pass */
+/* test 21 - relop expression must return int */
+
+int x;
+int y;
+
+
+int my ( float b, int c)
+{
+	int z;
+	
+	z = z+c;
+
+	return z;
+}
+
+
+void main( int x, int y )
+{
+	float q;
+	int z;
+	x=1;
+	y=2;
+	z = x + y;
+	if (z < 5)
+	{
+		z=my(q,z);
+	}
+	
+	if (q)
+		z=z+1;
+
+}
+
+int something( int z, int q)
+{
+	int why;
+
+	why = z+q;
+
+	return why;
+
+}

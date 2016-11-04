@@ -1,0 +1,42 @@
+
+/* test for basic functionality of proj 3 - fail */
+/* test 20 - return wrong type ID */
+
+int x;
+int y;
+
+
+int my ( float b, int c)
+{
+	int z;
+	
+	z = z+c;
+
+	return b;
+}
+
+
+void main( int x, int y )
+{
+	float q;
+	int z;
+	x=1;
+	y=2;
+	z = x + y;
+	if (z < 5)
+	{
+		z=my(q,z);
+	
+	}
+
+}
+
+int something( int z, int q)
+{
+	int why;
+
+	why = z+q;
+
+	return why;
+
+}

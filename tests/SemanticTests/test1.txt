@@ -1,0 +1,15 @@
+
+/* test for basic funtionality of proj 3 - should pass */
+/* test 1 */
+
+int x;
+int y;
+
+void main ( int x, int y )
+{
+	int z;
+	
+	z = x + y;
+
+}
+

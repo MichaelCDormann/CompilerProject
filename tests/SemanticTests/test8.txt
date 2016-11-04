@@ -1,0 +1,32 @@
+
+/* test for basic functionality of proj 3 - pass */
+/* test 8 - test simple function return */
+
+int x;
+int y;
+
+
+int my ( float b, int c)
+{
+	int z;
+	
+	z = z+c;
+
+	return z+c;
+}
+
+
+void main ( int x, int y )
+{
+	int z;
+	x=1;
+	y=2;
+	z = x + y;
+	if (z < 5)
+	{
+		z=my(1.2, 2);
+	
+	}
+
+}
+

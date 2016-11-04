@@ -1,0 +1,35 @@
+# COP 4620 - Construction of Language Translators
+
+**Project 2 - Syntactic Analyzer**
+Michael Dormann
+N00958758
+
+Dr. Roger Eggen
+Due 10/20/16 Thursday, 11:59 PM
+
+### Project Scope
+
+The goal of this project is to create a recursive descent parser for the language C- based on the grammar given in the
+appendix of the text ***Compiler Construction, Principles and Practice by Louden***. The grammar from the book is not
+LL(1) parse-able in it's given form. What I have done for this project is fix any left recursion and left factoring in
+the grammar to make it LL(1) parse-able and implemented a top down recursive descent parser for the fixed grammar.
+ 
+### General Design
+
+I chose to write this project entirely in python.
+
+This project takes the token-lexum tuple list returned by the Lexical Analyzer in project 1 and feeds it to the parser
+(Syntax Analyzer) for this project. The Syntax Analyzer includes a symbol table that is built during the parse which
+stores identifiers and associated information for functions and variables encountered in the program.
+
+The parser is implemented through the large amount of methods simulating the grammar's rules in it's own
+Syntax Analyzer class, along with an Accept method to accept the current token and load the next one, an InsertST method
+to insert into the symbol table, and a run method to run the parse.
+
+Whenever the parser runs into an unexpected token (basically meaning the program it is parsing doesn't conform to the
+grammar rules) it raises a RejectException which is handled by the try/except in the run method.
+
+### How to Run
+
+* Obtain(somehow) a source file for a program written C-
+* Run the Syntactic Analyzer with the command `./p2 [source file name]`
