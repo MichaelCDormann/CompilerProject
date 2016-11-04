@@ -1,4 +1,4 @@
-void main(void)    /* good */
+void main(void)    /* accept */
  {
  	int q;	
  	int b;

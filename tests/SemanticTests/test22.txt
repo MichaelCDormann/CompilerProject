@@ -1,5 +1,4 @@
-
-/* test for basic functionality of proj 3 - pass */
+/* test for basic functionality of proj 3 - accept */
 /* test 21 - relop expression must return int */
 
 int x;

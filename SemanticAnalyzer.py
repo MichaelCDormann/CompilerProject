@@ -51,7 +51,7 @@ class Func(object):
 		self.params = params
 		self.param_count = len(params)
 
-class SyntaxAnalyzer(object):
+class SemanticAnalyzer(object):
 
 	def __init__(self, token_lexum_list):
 		self.index = 0

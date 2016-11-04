@@ -1,4 +1,3 @@
-
 /* test for basic functionality of proj 3 - should fail */
 /* test 3 - 2 methods, scope check on b */
 

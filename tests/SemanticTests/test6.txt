@@ -1,5 +1,4 @@
-
-/* test for basic functionality of proj 3 - pass */
+/* test for basic functionality of proj 3 - accept */
 /* test 6 - calling a method, scope check of function */
 
 int x;

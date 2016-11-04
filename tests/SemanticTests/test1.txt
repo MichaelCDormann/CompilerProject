@@ -1,5 +1,4 @@
-
-/* test for basic funtionality of proj 3 - should pass */
+/* test for basic funtionality of proj 3 - should accept */
 /* test 1 */
 
 int x;

@@ -1,5 +1,4 @@
-
- // test 51, should pass
+ // test 51, should accept
  int  main(void) /* good nested */
  {
     int x;

@@ -3,15 +3,15 @@ import re
 import pytest
 
 from LexicalAnalyzer.LexicalAnalyzer import *
-from SyntaxAnalyzer.SyntaxAnalyzer import *
+from SemanticAnalyzer import *
 
 testdata = []
 
-files = os.listdir("./SyntaxTests")
+files = os.listdir("./SemanticTests")
 
 for file in files:
 	if re.match("test[0-9]+.txt", file):
-		file = "./SyntaxTests/" + file
+		file = "./SemanticTests/" + file
 		with open(file, 'r') as openfile:
 			lines = openfile.readlines()
 			firstline = lines[0]
@@ -31,7 +31,7 @@ def test_syntaxanalyzer(file, exp_result):
 	analyzer = LexicalAnalyzer(fl)
 	result = analyzer.analyze()
 
-	syntaxer = SyntaxAnalyzer(result)
-	run_result = syntaxer.Run()
+	semanter = SemanticAnalyzer(result)
+	run_result = semanter.Run()
 
 	assert run_result == exp_result
