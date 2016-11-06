@@ -12,7 +12,6 @@ params_lf           ->  id param_lf param-list_prime | empty
 param-list_prime    ->  , param param-list_prime | empty
 param               ->  int id param_lf | void id param_lf | float id param_lf
 param_lf            ->  [ ] | empty
-#LL(2) param_lf because follow(param_lf) = {) [ ,}
 compound-stmt       ->  { local-declarations statement-list }
 local-declarations  ->  int dec_lf local-declarations | void dec_lf local-declarations | float dec_lf local-declarations | empty
 statement-list      ->  statement statement-list | empty

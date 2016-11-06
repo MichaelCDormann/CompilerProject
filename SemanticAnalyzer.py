@@ -63,6 +63,11 @@ class SemanticAnalyzer(object):
 		self.getParams = False
 		self.paramString = ""
 
+		self.bool_main = False
+
+		self.semmantic_stack = []
+		self.func_stack = []
+
 	def Accept(self):
 		if self.curToken == "{":
 			SymbolTable.IncrementDepth()
@@ -95,16 +100,24 @@ class SemanticAnalyzer(object):
 		self.curString = self.curString.strip()
 		if re.match("(int|void|float) [A-Za-z][A-Za-z0-9]* ;", self.curString):
 			tokens = self.curString.split(" ")
+			if tokens[0] == "void":
+				raise RejectException("Invalid type")
 			SymbolTable.AddItem(tokens[1], Var(tokens[0]))
 			self.curString = ""
 		elif re.match("(int|void|float) [A-Za-z][A-Za-z0-9]* " + re.escape("[") + " [0-9]+ " + re.escape("]") +" ;", self.curString):
 			tokens = self.curString.split(" ")
+			if tokens[0] == "void":
+				raise RejectException("Invalid type")
 			SymbolTable.AddItem(tokens[1], Var(tokens[0], None, tokens[3]))
 			self.curString = ""
 		#elif re.match("(int|void|float) [A-Za-z][A-Za-z0-9]* " + re.escape("(") + " ((int|void|float) [A-Za-z][A-Za-z0-9]* (, )?)*" + re.escape(")"), self.curString):
 		elif self.getParams == True:
 			tokens = self.curString.split(" ")
 			params = self.paramString.split(",")
+			if tokens[1] == "main" and self.bool_main:
+				raise RejectException("main has already been defined")
+			elif tokens[1] == "main":
+				self.bool_main = True
 			SymbolTable.AddItem(tokens[1], Func(tokens[0], params))
 			self.curString = ""
 			self.paramString = ""
@@ -355,11 +368,21 @@ class SemanticAnalyzer(object):
 		if self.curToken == "return":
 			self.Accept()
 			self.retstmt_lf()
+
+			ret_type = self.semmantic_stack.pop()
+			func = self.func_stack.pop()
+			if isinstance(func, Func):
+				if func.ret_type != ret_type:
+					raise RejectException("Invalid return type")
+			else:
+				raise RejectException("Invalid use of return")
+
 		else:
 			raise RejectException("Next token was '" + self.curToken + "' was expecting 'return'")
 
 	def retstmt_lf(self):
 		if self.curToken == ";":
+			self.semmantic_stack.append("void")
 			self.Accept()
 		elif self.curToken in ["(", "num", "id", "float_num"]:
 			self.expression()
@@ -372,8 +395,25 @@ class SemanticAnalyzer(object):
 
 	def expression(self):
 		if self.curToken == "id":
+			ls = SymbolTable.GetItem(self.curToken)
+			if isinstance(ls, Var):
+				self.semmantic_stack.append(ls.type)
+			elif isinstance(ls, Func):
+				self.semmantic_stack.append(ls)
+				self.func_stack.append(ls)
+			else:
+				raise RejectException(self.curToken + " has not been defined")
 			self.Accept()
 			self.expr_lf()
+
+			rs = self.semmantic_stack.pop()
+			ls = self.semmantic_stack.pop()
+
+			if ls != rs:
+				raise RejectException("Incompatible types")
+			else:
+				self.semmantic_stack.append(ls)
+
 		elif self.curToken == "(":
 			self.Accept()
 			self.expression()
@@ -385,6 +425,11 @@ class SemanticAnalyzer(object):
 			else:
 				raise RejectException("Next token was '" + self.curToken + "' was expecting ')'")
 		elif self.curToken in ["num", "float_num"]:
+			if self.curToken == "num":
+				self.semmantic_stack.append("int")
+			elif self.curToken == "float_num":
+				self.semmantic_stack.append("float")
+
 			self.Accept()
 			self.term_prime()
 			self.addexpr_prime()
@@ -399,6 +444,21 @@ class SemanticAnalyzer(object):
 		elif self.curToken == "(":
 			self.Accept()
 			self.args()
+
+			params = []
+			while not isinstance(self.semmantic_stack[-1], Func):
+				params.append(self.semmantic_stack.pop())
+			func = self.semmantic_stack.pop()
+
+			if len(params) != func.param_count:
+				raise RejectException("Invalid number of parameters")
+			else:
+				for i in range(0, func.param_count):
+					if func.params[i].split(" ")[0] != params[i]:
+						raise RejectException("Invalid parameter types")
+
+			self.semmantic_stack.append(func.ret_type)
+
 			if self.curToken == ")":
 				self.Accept()
 				self.term_prime()
@@ -428,6 +488,11 @@ class SemanticAnalyzer(object):
 		if self.curToken == "[":
 			self.Accept()
 			self.expression()
+
+			index = self.semmantic_stack.pop()
+			if index != "num":
+				raise RejectException("Invalid index")
+
 			if self.curToken == "]":
 				self.Accept()
 			else:
@@ -511,7 +576,9 @@ class SemanticAnalyzer(object):
 			self.Accept()
 			self.factor_lf()
 		elif self.curToken in ["num", "float_num"]:
+			ret_type = self.curToken
 			self.Accept()
+			return ret_type
 		else:
 			raise RejectException("Next token was '" + self.curToken + "' was expecting '(', 'id', 'num' or 'float_num'")
 
