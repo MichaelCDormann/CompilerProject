@@ -67,6 +67,7 @@ class SemanticAnalyzer(object):
 
 		self.semmantic_stack = []
 		self.func_stack = []
+		self.dontpop = False
 
 	def Accept(self):
 		if self.curToken == "{":
@@ -118,9 +119,10 @@ class SemanticAnalyzer(object):
 				raise RejectException("main has already been defined")
 			elif tokens[1] == "main":
 				self.bool_main = True
-			SymbolTable.AddItem(tokens[1], Func(tokens[0], params))
+			func = Func(tokens[0], params)
+			SymbolTable.AddItem(tokens[1], func)
+			self.func_stack.append(func)
 			self.curString = ""
-			self.paramString = ""
 			self.getParams = False
 
 	def Run(self):
@@ -260,9 +262,22 @@ class SemanticAnalyzer(object):
 	def compoundstmt(self):
 		if self.curToken == "{":
 			self.Accept()
+
+			if len(self.paramString):
+				for param in self.paramString.split(","):
+					param = param.strip()
+					slt = param.split(" ")
+					SymbolTable.AddItem(slt[1], Var(slt[0]))
+
+				self.paramString = ""
+
 			self.localdeclarations()
 			self.statementlist()
 			if self.curToken == "}":
+
+				if len(self.func_stack) != 0 and SymbolTable.depth == 1:
+					raise RejectException("Missing return statement")
+
 				self.Accept()
 			else:
 				raise RejectException("Next token was '" + self.curToken + "' was expecting '}'")
@@ -395,24 +410,24 @@ class SemanticAnalyzer(object):
 
 	def expression(self):
 		if self.curToken == "id":
-			ls = SymbolTable.GetItem(self.curToken)
+			ls = SymbolTable.GetItem(self.curLexum)
 			if isinstance(ls, Var):
 				self.semmantic_stack.append(ls.type)
 			elif isinstance(ls, Func):
 				self.semmantic_stack.append(ls)
-				self.func_stack.append(ls)
 			else:
 				raise RejectException(self.curToken + " has not been defined")
 			self.Accept()
 			self.expr_lf()
 
-			rs = self.semmantic_stack.pop()
-			ls = self.semmantic_stack.pop()
+			if len(self.semmantic_stack) > 1 and not self.dontpop:
+				rs = self.semmantic_stack.pop()
+				ls = self.semmantic_stack.pop()
 
-			if ls != rs:
-				raise RejectException("Incompatible types")
-			else:
-				self.semmantic_stack.append(ls)
+				if ls != rs:
+					raise RejectException("Incompatible types")
+				elif len(self.semmantic_stack) != 0:
+					self.semmantic_stack.append(ls)
 
 		elif self.curToken == "(":
 			self.Accept()
@@ -443,21 +458,25 @@ class SemanticAnalyzer(object):
 			self.expr_lf_lf()
 		elif self.curToken == "(":
 			self.Accept()
+			self.dontpop = True
 			self.args()
 
 			params = []
 			while not isinstance(self.semmantic_stack[-1], Func):
 				params.append(self.semmantic_stack.pop())
+			params.reverse()
 			func = self.semmantic_stack.pop()
 
 			if len(params) != func.param_count:
 				raise RejectException("Invalid number of parameters")
 			else:
 				for i in range(0, func.param_count):
+					func.params[i] = func.params[i].strip()
 					if func.params[i].split(" ")[0] != params[i]:
 						raise RejectException("Invalid parameter types")
 
 			self.semmantic_stack.append(func.ret_type)
+			self.dontpop = False
 
 			if self.curToken == ")":
 				self.Accept()
@@ -490,7 +509,7 @@ class SemanticAnalyzer(object):
 			self.expression()
 
 			index = self.semmantic_stack.pop()
-			if index != "num":
+			if index != "int":
 				raise RejectException("Invalid index")
 
 			if self.curToken == "]":
@@ -525,6 +544,16 @@ class SemanticAnalyzer(object):
 		if self.curToken in ["+", "-"]:
 			self.addop()
 			self.term()
+
+			if len(self.semmantic_stack) % 2 == 0:
+				rs = self.semmantic_stack.pop()
+				ls = self.semmantic_stack.pop()
+
+				if rs != ls:
+					raise RejectException("Type mismatch")
+
+				self.semmantic_stack.append(ls)
+
 			self.addexpr_prime()
 		elif self.curToken in [")", ",", ">=", "==", "]", ";", "<=", "!=", "<", ">"]:
 			pass
@@ -550,6 +579,15 @@ class SemanticAnalyzer(object):
 		if self.curToken in ["*", "/"]:
 			self.mulop()
 			self.factor()
+
+			if len(self.semmantic_stack) % 2 == 0:
+				rs = self.semmantic_stack.pop()
+				ls = self.semmantic_stack.pop()
+				if ls != rs:
+					raise RejectException("Mismatchhed types")
+
+				self.semmantic_stack.append(ls)
+
 			self.term_prime()
 		elif self.curToken in [">=", "==", "]", "+", "<=", "-", ",", ")", ";", "!=", "<", ">"]:
 			pass
@@ -573,12 +611,23 @@ class SemanticAnalyzer(object):
 			else:
 				raise RejectException("Next token was '" + self.curToken + "' was expecting ')'")
 		elif self.curToken == "id":
+			ls = SymbolTable.GetItem(self.curLexum)
+			if isinstance(ls, Var):
+				self.semmantic_stack.append(ls.type)
+			elif isinstance(ls, Func):
+				self.semmantic_stack.append(ls)
+			else:
+				raise RejectException(self.curToken + " has not been defined")
+
 			self.Accept()
 			self.factor_lf()
 		elif self.curToken in ["num", "float_num"]:
-			ret_type = self.curToken
+			if self.curToken == "num":
+				self.semmantic_stack.append("int")
+			elif self.curToken == "float_num":
+				self.semmantic_stack.append("float")
+
 			self.Accept()
-			return ret_type
 		else:
 			raise RejectException("Next token was '" + self.curToken + "' was expecting '(', 'id', 'num' or 'float_num'")
 
@@ -588,6 +637,21 @@ class SemanticAnalyzer(object):
 		elif self.curToken == "(":
 			self.Accept()
 			self.args()
+
+			params = []
+			while not isinstance(self.semmantic_stack[-1], Func):
+				params.append(self.semmantic_stack.pop())
+			func = self.semmantic_stack.pop()
+
+			if len(params) != func.param_count:
+				raise RejectException("Invalid number of parameters")
+			else:
+				for i in range(0, func.param_count):
+					if func.params[i].split(" ")[0] != params[i]:
+						raise RejectException("Invalid parameter types")
+
+			self.semmantic_stack.append(func.ret_type)
+
 			if self.curToken == ")":
 				self.Accept()
 			else:
@@ -621,5 +685,5 @@ class SemanticAnalyzer(object):
 
 
 class RejectException(Exception):
-	def __init__(self,*args,**kwargs):
-		Exception.__init__(self,*args,**kwargs)
+	def __init__(self, *args, **kwargs):
+		Exception.__init__(self, *args, **kwargs)

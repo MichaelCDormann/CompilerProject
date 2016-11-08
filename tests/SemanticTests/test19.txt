@@ -28,6 +28,8 @@ void main( int x, int y )
 	
 	}
 
+	return;
+
 }
 
 int something( int z, int q)
