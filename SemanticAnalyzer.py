@@ -266,8 +266,9 @@ class SemanticAnalyzer(object):
 			if len(self.paramString):
 				for param in self.paramString.split(","):
 					param = param.strip()
-					slt = param.split(" ")
-					SymbolTable.AddItem(slt[1], Var(slt[0]))
+					if param != "void":
+						slt = param.split(" ")
+						SymbolTable.AddItem(slt[1], Var(slt[0]))
 
 				self.paramString = ""
 
