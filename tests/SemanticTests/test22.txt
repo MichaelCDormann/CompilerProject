@@ -30,6 +30,8 @@ void main( int x, int y )
 	if (q)
 		z=z+1;
 
+	return;
+
 }
 
 int something( int z, int q)

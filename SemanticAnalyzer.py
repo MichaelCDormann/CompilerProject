@@ -176,6 +176,7 @@ class SemanticAnalyzer(object):
 					if self.curToken == "]":
 						self.Accept()
 						if self.curToken == ";":
+							del self.semmantic_stack[:]
 							self.Accept()
 						else:
 							raise RejectException("Next token was '" + self.curToken + "' was expecting ';'")
@@ -184,6 +185,7 @@ class SemanticAnalyzer(object):
 				else:
 					raise RejectException("Next token was '" + self.curToken + "' was expecting 'num'")
 			elif self.curToken == ";":
+				del self.semmantic_stack[:]
 				self.Accept()
 			else:
 				raise RejectException("Next token was '" + self.curToken + "' was expecting '['")
@@ -195,6 +197,7 @@ class SemanticAnalyzer(object):
 			if self.curToken == ")":
 				self.InsertST()
 				self.Accept()
+				del self.semmantic_stack[:]
 				self.compoundstmt()
 			else:
 				raise RejectException("Next token was '" + self.curToken + "' was expecting ')'")
@@ -263,6 +266,8 @@ class SemanticAnalyzer(object):
 		if self.curToken == "{":
 			self.Accept()
 
+			del self.semmantic_stack[:]
+
 			if len(self.paramString):
 				for param in self.paramString.split(","):
 					param = param.strip()
@@ -328,10 +333,12 @@ class SemanticAnalyzer(object):
 		if self.curToken in ["(", "num", "id", "float_num"]:
 			self.expression()
 			if self.curToken == ";":
+				del self.semmantic_stack[:]
 				self.Accept()
 			else:
 				raise RejectException("Next token was '" + self.curToken + "' was expecting ';'")
 		elif self.curToken == ";":
+			del self.semmantic_stack[:]
 			self.Accept()
 		else:
 			raise RejectException("Next token was '" + self.curToken + "' was expecting '(', 'num', 'id', 'float_num', or ';'")
@@ -343,6 +350,7 @@ class SemanticAnalyzer(object):
 				self.Accept()
 				self.expression()
 				if self.curToken == ")":
+					del self.semmantic_stack[:]
 					self.Accept()
 					self.statement()
 					self.selstmt_lf()
