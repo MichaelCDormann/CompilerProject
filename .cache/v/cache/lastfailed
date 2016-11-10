@@ -1,0 +1,4 @@
+{
+  "tests/test_SemanticAnalyzer.py": true, 
+  "tests/test_SyntaxAnalyzer.py": true
+}

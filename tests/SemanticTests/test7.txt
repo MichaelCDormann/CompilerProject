@@ -23,7 +23,7 @@ void main ( int x, int y )
 	z = x + y;
 	if (z < 5)
 	{
-		z=my(1, 2);
+		z=my(1.2, 2);
 	
 	}
 

@@ -128,7 +128,10 @@ class SemanticAnalyzer(object):
 	def Run(self):
 		try:
 			self.program()
-			return "ACCEPT"
+			if self.bool_main:
+				return "ACCEPT"
+			else:
+				return "REJECT"
 		except RejectException:
 			return "REJECT"
 		#self.program()
@@ -282,7 +285,9 @@ class SemanticAnalyzer(object):
 			if self.curToken == "}":
 
 				if len(self.func_stack) != 0 and SymbolTable.depth == 1:
-					raise RejectException("Missing return statement")
+					func = self.func_stack.pop()
+					if func.ret_type != "void":
+						raise RejectException("Missing return statement")
 
 				self.Accept()
 			else:
@@ -427,6 +432,11 @@ class SemanticAnalyzer(object):
 			else:
 				raise RejectException(self.curToken + " has not been defined")
 			self.Accept()
+
+			if isinstance(ls, Var):
+				if ls.size > 0 and self.curToken != "[":
+					raise RejectException("Expected [ for array index")
+
 			self.expr_lf()
 
 			if len(self.semmantic_stack) > 1 and not self.dontpop:
@@ -629,6 +639,11 @@ class SemanticAnalyzer(object):
 				raise RejectException(self.curToken + " has not been defined")
 
 			self.Accept()
+
+			if isinstance(ls, Var):
+				if ls.size > 0 and self.curToken != "[":
+					raise RejectException("Expected [ for array index")
+
 			self.factor_lf()
 		elif self.curToken in ["num", "float_num"]:
 			if self.curToken == "num":

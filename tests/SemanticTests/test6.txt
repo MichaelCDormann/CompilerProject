@@ -8,10 +8,11 @@ int y;
 int my ( float b, int c)
 {
 	int z;
+	int d[5];
 	
 	z = z+c;
 
-	return z;
+	return d[8];
 }
 
 

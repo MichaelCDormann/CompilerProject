@@ -25,7 +25,7 @@ for file in files:
 @pytest.mark.parametrize("file, exp_result", testdata)
 def test_syntaxanalyzer(file, exp_result):
 
-	#print file, exp_result
+	print file, exp_result
 
 	fl = FileAccessManager(file)
 	analyzer = LexicalAnalyzer(fl)
@@ -33,5 +33,7 @@ def test_syntaxanalyzer(file, exp_result):
 
 	semanter = SemanticAnalyzer(result)
 	run_result = semanter.Run()
+
+	print result
 
 	assert run_result == exp_result
