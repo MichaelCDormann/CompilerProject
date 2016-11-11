@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import sys
 from LexicalAnalyzer.LexicalAnalyzer import *
 from SemanticAnalyzer import *
@@ -8,7 +10,5 @@ result = analyzer.analyze()
 
 semanter = SemanticAnalyzer(result)
 run_result = semanter.Run()
-
-#print result
 
 print run_result
