@@ -4,15 +4,17 @@
 int x;
 int y;
 
-void my (void)
+int my (float a, int b)
 {
 	int z;
 
 	int z;
 
+    return 4;
+
 }
 
-void main( int x, int y )
+void main( void )
 {
 	int z;
 	x=1;
@@ -20,7 +22,7 @@ void main( int x, int y )
 	z = x + y;
 	if (z < 5)
 	{
-		z=my(1.2, 2.5);
+		z=my(1.2, 2);
 	
 	}
 

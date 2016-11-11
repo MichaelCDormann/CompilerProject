@@ -9,7 +9,10 @@ class SymbolTable(object):
 	def AddItem(cls, name, item):
 		if len(cls.dict_list) <= cls.depth:
 			cls.dict_list.append({})
-		cls.dict_list[cls.depth][name] = item
+		if name not in cls.dict_list[cls.depth]:
+			cls.dict_list[cls.depth][name] = item
+		else:
+			raise RejectException("ID already been declared")
 
 	@classmethod
 	def Pop(cls):

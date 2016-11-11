@@ -15,7 +15,7 @@ int my ( float b, int c)
 }
 
 
-void main( int x, int y )
+void main( void )
 {
 	int z;
 	x=1;
@@ -23,7 +23,7 @@ void main( int x, int y )
 	z = x + y;
 	if (z < 5)
 	{
-		z=there(1.2, 2.5);
+		z=there(1.2, 2);
 	
 	}
 
