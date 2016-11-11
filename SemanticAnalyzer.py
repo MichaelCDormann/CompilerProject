@@ -165,6 +165,8 @@ class SemanticAnalyzer(object):
 
 	def dec_lf(self):
 		if self.curToken == "id":
+			if self.curLexum == "main":
+				self.func_stack.append("main")
 			self.Accept()
 			self.dec_lf_lf()
 		else:
@@ -209,6 +211,11 @@ class SemanticAnalyzer(object):
 
 	def params(self):
 		if self.curToken in ["int", "float"]:
+			if len(self.func_stack) > 0:
+				if self.func_stack[-1] == "main":
+					self.func_stack.pop()
+					raise RejectException("Invalid parameters for main function")
+
 			self.Accept()
 			if self.curToken == "id":
 				self.Accept()
@@ -217,6 +224,9 @@ class SemanticAnalyzer(object):
 			else:
 				raise RejectException("Next token was '" + self.curToken + "' was expecting 'id'")
 		elif self.curToken == "void":
+			if len(self.func_stack) > 0:
+				if self.func_stack[-1] == "main":
+					self.func_stack.pop()
 			self.Accept()
 			self.params_lf()
 		else:

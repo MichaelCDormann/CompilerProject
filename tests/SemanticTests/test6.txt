@@ -16,7 +16,7 @@ int my ( float b, int c)
 }
 
 
-void main ( int x, int y )
+void main ( void )
 {
 	int z;
 	x=1;

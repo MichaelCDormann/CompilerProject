@@ -23,7 +23,7 @@ for file in files:
 		testdata.append((file, ex_result))
 
 @pytest.mark.parametrize("file, exp_result", testdata)
-def test_syntaxanalyzer(file, exp_result):
+def test_semanticanalyzer(file, exp_result):
 
 	print file, exp_result
 
@@ -34,6 +34,6 @@ def test_syntaxanalyzer(file, exp_result):
 	semanter = SemanticAnalyzer(result)
 	run_result = semanter.Run()
 
-	print result
+	#print result
 
 	assert run_result == exp_result
