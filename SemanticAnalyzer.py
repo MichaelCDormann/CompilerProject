@@ -129,15 +129,15 @@ class SemanticAnalyzer(object):
 			self.getParams = False
 
 	def Run(self):
-		try:
-			self.program()
-			if self.bool_main:
-				return "ACCEPT"
-			else:
-				return "REJECT"
-		except RejectException:
-			return "REJECT"
-		#self.program()
+		#try:
+		#	self.program()
+		#	if self.bool_main:
+		#		return "ACCEPT"
+		#	else:
+		#		return "REJECT"
+		#except RejectException:
+		#	return "REJECT"
+		self.program()
 
 	#---------------------------------------
 	# These methods actually do the parsing
@@ -419,6 +419,9 @@ class SemanticAnalyzer(object):
 			else:
 				raise RejectException("Invalid use of return")
 
+			if self.curToken != "}" or SymbolTable.depth != 1:
+				self.func_stack.append(func)
+
 		else:
 			raise RejectException("Next token was '" + self.curToken + "' was expecting 'return'")
 
@@ -446,7 +449,7 @@ class SemanticAnalyzer(object):
 				raise RejectException(self.curToken + " has not been defined")
 			self.Accept()
 
-			if isinstance(ls, Var):
+			if isinstance(ls, Var) and not self.dontpop:
 				if ls.size > 0 and self.curToken != "[":
 					raise RejectException("Expected [ for array index")
 
@@ -455,6 +458,9 @@ class SemanticAnalyzer(object):
 			if len(self.semmantic_stack) > 1 and not self.dontpop:
 				rs = self.semmantic_stack.pop()
 				ls = self.semmantic_stack.pop()
+
+				if isinstance(ls, Func):
+					ls = ls.ret_type
 
 				if ls != rs:
 					raise RejectException("Incompatible types")
@@ -500,7 +506,10 @@ class SemanticAnalyzer(object):
 			func = self.semmantic_stack.pop()
 
 			if len(params) != func.param_count:
-				raise RejectException("Invalid number of parameters")
+				if len(params) == 0 and ''.join(func.params).strip() == "void":
+					pass
+				else:
+					raise RejectException("Invalid number of parameters")
 			else:
 				for i in range(0, func.param_count):
 					func.params[i] = func.params[i].strip()
