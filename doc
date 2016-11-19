@@ -1,40 +1,19 @@
 # COP 4620 - Construction of Language Translators
 
-**Project 3 - Semantic Analyzer**
+**Project 4 - Code Generator**
 Michael Dormann
 N00958758
 
 Dr. Roger Eggen
-Due 11/10/16 Thursday, 11:59 PM
+Due 11/28/16 Thursday, 11:59 PM
 
 ### Project Scope
 
-The goal of this project is to modify the recursive decent parser from project 2 to include semantic analysis.
-
-Some of the semantic checks implemented are:
-* All IDs must be declared in their scope or in a parent scope
-* An ID can only be declared once for each scope
-* There must be one and only one main function with a return type of void and a parameter list of void - void main(void)) {}
-* Only simple structures can be returned from a function
-* Functions must be defined before they are called
-* Parameters in a function call must match the number and type of parameters in the declaration
-* Variable assignment must be the same as it's type
-* Operations and comparisons must be done on items of the same type (float = float, int + int, int > int, etc...)
-* Functions declared int or float must have a return of a similar type
-* Void functions may or may not have a return, but cannot return a value
-* Variables cannot be of type void
 
 ### General Design
 
-I decided to implement this with a stack. In general when an ID, float, or int is encountered it pushes it onto the
-stack. Then later those items are popped off of the stack and compared to do the semantic analysis. When a function
-is called it gets pushed onto the stack and then any subsequent parameters are also pushed onto the stack. Then
-items are popped off of the stack until a function is the last item popped off. Then semantic tests are performed
-on the function call and it's parameters. When a function is declared it is pushed onto a separate function stack.
-Then at the end of the declaration the function is popped off and semantic tests are performed on the return information.
-The SymbolTable class methods do semantic tests on items inserted and searched for in the list of tables.
 
 ### How to Run
 
 * Obtain(somehow) a source file for a program written C-
-* Run the Syntactic Analyzer with the command `./p3 [source file name]`
+* Run the Syntactic Analyzer with the command `./p4 [source file name]`
