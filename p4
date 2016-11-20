@@ -2,13 +2,13 @@
 
 import sys
 from LexicalAnalyzer.LexicalAnalyzer import *
-from SemanticAnalyzer import *
+from CodeGenerator import *
 
 fl = FileAccessManager(sys.argv[1])
 analyzer = LexicalAnalyzer(fl)
 result = analyzer.analyze()
 
-semanter = SemanticAnalyzer(result)
-run_result = semanter.Run()
+generator = CodeGenerator(result)
+run_result = generator.Run()
 
 print run_result

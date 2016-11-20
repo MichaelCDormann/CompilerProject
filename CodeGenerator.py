@@ -54,7 +54,7 @@ class Func(object):
 		self.params = params
 		self.param_count = len(params)
 
-class SemanticAnalyzer(object):
+class CodeGenerator(object):
 
 	def __init__(self, token_lexum_list):
 		self.index = 0
@@ -66,11 +66,12 @@ class SemanticAnalyzer(object):
 		self.getParams = False
 		self.paramString = ""
 
-		self.bool_main = False
+		self.codeTable = list()
+		#self.bool_main = False
 
-		self.semmantic_stack = []
-		self.func_stack = []
-		self.dontpop = False
+		#self.semmantic_stack = []
+		#self.func_stack = []
+		#self.dontpop = False
 
 	def Accept(self):
 		if self.curToken == "{":
@@ -104,26 +105,19 @@ class SemanticAnalyzer(object):
 		self.curString = self.curString.strip()
 		if re.match("(int|void|float) [A-Za-z][A-Za-z0-9]* ;", self.curString):
 			tokens = self.curString.split(" ")
-			if tokens[0] == "void":
-				raise RejectException("Invalid type")
-			SymbolTable.AddItem(tokens[1], Var(tokens[0]))
+			self.codeTable.append(["alloc", "4", "", tokens[1]])
 			self.curString = ""
 		elif re.match("(int|void|float) [A-Za-z][A-Za-z0-9]* " + re.escape("[") + " [0-9]+ " + re.escape("]") +" ;", self.curString):
 			tokens = self.curString.split(" ")
-			if tokens[0] == "void":
-				raise RejectException("Invalid type")
-			SymbolTable.AddItem(tokens[1], Var(tokens[0], None, tokens[3]))
+			self.codeTable.append(["alloc", 4*int(tokens[3]), "", tokens[1]])
 			self.curString = ""
 		#elif re.match("(int|void|float) [A-Za-z][A-Za-z0-9]* " + re.escape("(") + " ((int|void|float) [A-Za-z][A-Za-z0-9]* (, )?)*" + re.escape(")"), self.curString):
 		elif self.getParams == True:
 			tokens = self.curString.split(" ")
 			params = self.paramString.split(",")
-			if tokens[1] == "main" and self.bool_main:
-				raise RejectException("main has already been defined")
-			elif tokens[1] == "main":
-				self.bool_main = True
 			func = Func(tokens[0], params)
 			SymbolTable.AddItem(tokens[1], func)
+			self.codeTable.append(["func", "", "", tokens[1]])
 			self.func_stack.append(func)
 			self.curString = ""
 			self.getParams = False
@@ -168,8 +162,6 @@ class SemanticAnalyzer(object):
 
 	def dec_lf(self):
 		if self.curToken == "id":
-			if self.curLexum == "main":
-				self.func_stack.append("main")
 			self.Accept()
 			self.dec_lf_lf()
 		else:
@@ -214,11 +206,6 @@ class SemanticAnalyzer(object):
 
 	def params(self):
 		if self.curToken in ["int", "float"]:
-			if len(self.func_stack) > 0:
-				if self.func_stack[-1] == "main":
-					self.func_stack.pop()
-					raise RejectException("Invalid parameters for main function")
-
 			self.Accept()
 			if self.curToken == "id":
 				self.Accept()
@@ -227,9 +214,6 @@ class SemanticAnalyzer(object):
 			else:
 				raise RejectException("Next token was '" + self.curToken + "' was expecting 'id'")
 		elif self.curToken == "void":
-			if len(self.func_stack) > 0:
-				if self.func_stack[-1] == "main":
-					self.func_stack.pop()
 			self.Accept()
 			self.params_lf()
 		else:
@@ -290,6 +274,7 @@ class SemanticAnalyzer(object):
 					if param != "void":
 						slt = param.split(" ")
 						SymbolTable.AddItem(slt[1], Var(slt[0]))
+						self.codeTable.append("param", "", "", slt[1])
 
 				self.paramString = ""
 
