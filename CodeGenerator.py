@@ -419,7 +419,6 @@ class CodeGenerator(object):
 
 	def retstmt_lf(self):
 		if self.curToken == ";":
-			self.semmantic_stack.append("void")
 			self.Accept()
 		elif self.curToken in ["(", "num", "id", "float_num"]:
 			self.expression()
@@ -427,6 +426,8 @@ class CodeGenerator(object):
 				self.Accept()
 			else:
 				raise RejectException("Next token was '" + self.curToken + "' was expecting ';'")
+			ret = self.semmantic_stack.pop()
+			self.codeTable.append(["ret", "", "", ret])
 		else:
 			raise RejectException("Next token was '" + self.curToken + "' was expecting ';', '(', 'id', 'num', or 'float_num'")
 
