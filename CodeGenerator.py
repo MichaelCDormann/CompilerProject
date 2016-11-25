@@ -68,6 +68,7 @@ class CodeGenerator(object):
 
 		self.codeTable = list()
 		self.tempCount = 0
+		self.backPatch = 0
 		#self.bool_main = False
 
 		self.semmantic_stack = []
@@ -76,10 +77,10 @@ class CodeGenerator(object):
 
 	def incrementTemp(self):
 		self.tempCount += 1
-		return "t" + self.tempCount
+		return "t" + str(self.tempCount)
 
 	def getTemp(self):
-		return "t" + self.tempCount
+		return "t" + str(self.tempCount)
 
 	def Accept(self):
 		if self.curToken == "{":
@@ -131,7 +132,7 @@ class CodeGenerator(object):
 				if param.strip() != "void":
 					self.codeTable.append(["param", "", "", param.strip()])
 
-			self.func_stack.append(func)
+			self.semmantic_stack.append(func)
 			self.curString = ""
 			self.getParams = False
 
@@ -333,8 +334,10 @@ class CodeGenerator(object):
 			self.compoundstmt()
 		elif self.curToken == "if":
 			self.selectionstmt()
+			self.codeTable[self.backPatch][4] = len(self.codeTable)
 		elif self.curToken == "while":
 			self.iterationstmt()
+			#self.codeTable[self.backPatch][4] = len(self.codeTable) - 1
 		elif self.curToken == "return":
 			self.returnstmt()
 		else:
@@ -374,6 +377,11 @@ class CodeGenerator(object):
 	def selstmt_lf(self):
 		if self.curToken == "else":
 			self.Accept()
+
+			self.codeTable[self.backPatch][4] = len(self.codeTable)
+			self.codeTable.append(["BR", "", "", ""])
+			self.backPatch = len(self.codeTable)
+
 			self.statement()
 		elif self.curToken in ["return", "(", "while", "num", "float_num", "{", ";", "}", "id", "if"]:
 			pass
@@ -384,6 +392,8 @@ class CodeGenerator(object):
 
 	def iterationstmt(self):
 		if self.curToken == "while":
+			startWhile = len(self.codeTable) - 1
+
 			self.Accept()
 			if self.curToken == "(":
 				self.Accept()
@@ -391,6 +401,8 @@ class CodeGenerator(object):
 				if self.curToken == ")":
 					self.Accept()
 					self.statement()
+
+					self.codeTable.append(["BR", "", "", startWhile])
 				else:
 					raise RejectException("Next token was '" + self.curToken + "' was expecting ')'")
 			else:
@@ -561,9 +573,33 @@ class CodeGenerator(object):
 
 	def simpexpr_lf(self):
 		if self.curToken in [">=", "==", "<=", "!=", "<", ">"]:
+			if self.curToken == "<=":
+				op = "BLE"
+			elif self.curToken == "<":
+				op = "BLT"
+			elif self.curToken == ">":
+				op = "BGT"
+			elif self.curToken == ">=":
+				op = "BGE"
+			elif self.curToken == "==":
+				op = "BE"
+			elif self.curToken == "!=":
+				op = "BNE"
+
 			self.relop()
 			self.term()
 			self.addexpr_prime()
+
+			rs = self.semmantic_stack.pop()
+			ls = self.semmantic_stack.pop()
+			self.codeTable.append(["comp", ls, rs, self.incrementTemp()])
+			self.semmantic_stack.append(self.getTemp())
+
+			self.codeTable.append([op, "", "", len(self.codeTable)])
+			self.codeTable.append(["BR", "", "", ""])
+
+			self.backPatch = len(self.codeTable)
+
 		elif self.curToken in [")", ";", "]", ","]:
 			pass
 		else:

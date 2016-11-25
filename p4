@@ -11,4 +11,4 @@ result = analyzer.analyze()
 generator = CodeGenerator(result)
 run_result = generator.Run()
 
-print run_result
+#print run_result
