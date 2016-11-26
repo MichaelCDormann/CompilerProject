@@ -353,7 +353,7 @@ class CodeGenerator(object):
 			self.codeTable[self.backPatch][3] = len(self.codeTable)
 		elif self.curToken == "while":
 			self.iterationstmt()
-			#self.codeTable[self.backPatch][4] = len(self.codeTable) - 1
+			self.codeTable[self.backPatch][3] = len(self.codeTable)
 		elif self.curToken == "return":
 			self.returnstmt()
 		else:
@@ -408,7 +408,7 @@ class CodeGenerator(object):
 
 	def iterationstmt(self):
 		if self.curToken == "while":
-			startWhile = len(self.codeTable) - 1
+			startWhile = len(self.codeTable)
 
 			self.Accept()
 			if self.curToken == "(":

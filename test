@@ -10,12 +10,7 @@ void main(void)
     int z;
     int q;
 
-    if (6 + 10 > z)
-    {
-        z = x + 5;
-        q = test(z, 5);
-    }
-    else {
-        x = x + z/y;
+    while( 5 + 17 == z/2) {
+        q = y/x + 7;
     }
 }
