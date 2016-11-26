@@ -48,8 +48,8 @@ class Var(object):
 
 class Func(object):
 
-	def __init__(self, ret_type, params=[]):
-		self.ret_type = ret_type
+	def __init__(self, name, params=[]):
+		self.name = name
 		#self.depth = depth
 		self.params = params
 		self.param_count = len(params)
@@ -69,6 +69,7 @@ class CodeGenerator(object):
 		self.codeTable = list()
 		self.tempCount = 0
 		self.backPatch = 0
+		self.exitFunc = False
 		#self.bool_main = False
 
 		self.semmantic_stack = []
@@ -97,8 +98,8 @@ class CodeGenerator(object):
 		if self.getParams:
 			if self.curToken in ["id", "num", "float_num"]:
 				self.paramString = self.paramString + self.curLexum + " "
-			else:
-				self.paramString = self.paramString + self.curToken + " "
+			#else:
+			#	self.paramString = self.paramString + self.curToken + " "
 
 		self.index += 1
 
@@ -114,26 +115,27 @@ class CodeGenerator(object):
 		self.curString = self.curString.strip()
 		if re.match("(int|void|float) [A-Za-z][A-Za-z0-9]* ;", self.curString):
 			tokens = self.curString.split(" ")
-			self.codeTable.append(["alloc", "4", "", tokens[1]])
+			self.codeTable.append(["alloc", "4", " ", tokens[1]])
 			self.curString = ""
 		elif re.match("(int|void|float) [A-Za-z][A-Za-z0-9]* " + re.escape("[") + " [0-9]+ " + re.escape("]") +" ;", self.curString):
 			tokens = self.curString.split(" ")
-			self.codeTable.append(["alloc", 4*int(tokens[3]), "", tokens[1]])
+			self.codeTable.append(["alloc", 4*int(tokens[3]), " ", tokens[1]])
 			self.curString = ""
 		#elif re.match("(int|void|float) [A-Za-z][A-Za-z0-9]* " + re.escape("(") + " ((int|void|float) [A-Za-z][A-Za-z0-9]* (, )?)*" + re.escape(")"), self.curString):
 		elif self.getParams == True:
 			tokens = self.curString.split(" ")
-			params = self.paramString.split(",")
-			func = Func(tokens[0], params)
+			params = self.paramString.strip().split(" ")
+			func = Func(tokens[1], params)
 			SymbolTable.AddItem(tokens[1], func)
 
-			self.codeTable.append(["func", len(params), "", tokens[1]])
+			self.codeTable.append(["func", len(params), " ", tokens[1]])
 			for param in params:
-				if param.strip() != "void":
-					self.codeTable.append(["param", "", "", param.strip()])
+				if param.strip() != "void" and param != "":
+					self.codeTable.append(["param", " ", " ", param.strip()])
 
-			self.semmantic_stack.append(func)
+			#self.semmantic_stack.append(func)
 			self.curString = ""
+			self.paramString = ""
 			self.getParams = False
 
 	def Run(self):
@@ -146,8 +148,15 @@ class CodeGenerator(object):
 		#except RejectException:
 		#	return "REJECT"
 		self.program()
+
+		for i, line in enumerate(self.codeTable):
+			if self.codeTable[i][0] == "asgn":
+				if self.codeTable[i-1][3] == self.codeTable[i][1]:
+					self.codeTable[i-1][3] = self.codeTable[i][3]
+					self.codeTable.remove(line)
+
 		for line in self.codeTable:
-			print line
+			print '{0:10}{1:10}{2:10}{3:10}'.format(str(line[0]), str(line[1]), str(line[2]), str(line[3]))
 
 	#---------------------------------------
 	# These methods actually do the parsing
@@ -178,8 +187,13 @@ class CodeGenerator(object):
 
 	def dec_lf(self):
 		if self.curToken == "id":
+			id = self.curLexum
 			self.Accept()
 			self.dec_lf_lf()
+
+			if self.exitFunc:
+				self.codeTable.append(["end", " ", " ", id])
+				self.exitFunc = False
 		else:
 			raise RejectException("Next token was '" + self.curToken + "' expected 'id'")
 
@@ -212,6 +226,8 @@ class CodeGenerator(object):
 				self.InsertST()
 				self.Accept()
 				self.compoundstmt()
+
+				self.exitFunc = True
 			else:
 				raise RejectException("Next token was '" + self.curToken + "' was expecting ')'")
 		else:
@@ -379,7 +395,7 @@ class CodeGenerator(object):
 			self.Accept()
 
 			self.codeTable[self.backPatch][4] = len(self.codeTable)
-			self.codeTable.append(["BR", "", "", ""])
+			self.codeTable.append(["BR", " ", " ", " "])
 			self.backPatch = len(self.codeTable)
 
 			self.statement()
@@ -402,7 +418,7 @@ class CodeGenerator(object):
 					self.Accept()
 					self.statement()
 
-					self.codeTable.append(["BR", "", "", startWhile])
+					self.codeTable.append(["BR", " ", " ", startWhile])
 				else:
 					raise RejectException("Next token was '" + self.curToken + "' was expecting ')'")
 			else:
@@ -439,14 +455,17 @@ class CodeGenerator(object):
 			else:
 				raise RejectException("Next token was '" + self.curToken + "' was expecting ';'")
 			ret = self.semmantic_stack.pop()
-			self.codeTable.append(["ret", "", "", ret])
+			self.codeTable.append(["ret", " ", " ", ret])
 		else:
 			raise RejectException("Next token was '" + self.curToken + "' was expecting ';', '(', 'id', 'num', or 'float_num'")
 
 	def expression(self):
 		if self.curToken == "id":
 
-			self.semmantic_stack.append(self.curLexum)
+			if isinstance(SymbolTable.GetItem(self.curLexum), Func):
+				self.semmantic_stack.append(SymbolTable.GetItem(self.curLexum))
+			else:
+				self.semmantic_stack.append(self.curLexum)
 
 			self.Accept()
 
@@ -503,10 +522,10 @@ class CodeGenerator(object):
 			params.reverse()
 			func = self.semmantic_stack.pop()
 
-			self.codeTable.append(["call", len(params), "", func])
+			self.codeTable.append(["call", len(params), "", func.name])
 			for param in params:
 				if param.strip() != "void":
-					self.codeTable.append(["arg", "", "", param.strip()])
+					self.codeTable.append(["arg", " ", " ", param.strip()])
 
 			#if len(params) != func.param_count:
 			#	if len(params) == 0 and ''.join(func.params).strip() == "void":
@@ -519,7 +538,7 @@ class CodeGenerator(object):
 			#		if func.params[i].split(" ")[0] != params[i]:
 			#			raise RejectException("Invalid parameter types")
 
-			self.semmantic_stack.append(func)
+			self.semmantic_stack.append(func.name)
 			#self.dontpop = False -- used in expression
 
 			if self.curToken == ")":
@@ -538,9 +557,9 @@ class CodeGenerator(object):
 		if self.curToken == "=":
 			self.Accept()
 			self.expression()
-			ls = self.semmantic_stack.pop()
 			rs = self.semmantic_stack.pop()
-			self.codeTable.append(["asgn", rs, "", ls])
+			ls = self.semmantic_stack.pop()
+			self.codeTable.append(["asgn", rs, " ", ls])
 		elif self.curToken in ["*", "/", "+", "-", ">=", "==", "<=", "!=", "<", ">", ")", ";", "]", ","]:
 			self.term_prime()
 			self.addexpr_prime()
@@ -595,8 +614,8 @@ class CodeGenerator(object):
 			self.codeTable.append(["comp", ls, rs, self.incrementTemp()])
 			self.semmantic_stack.append(self.getTemp())
 
-			self.codeTable.append([op, "", "", len(self.codeTable)])
-			self.codeTable.append(["BR", "", "", ""])
+			self.codeTable.append([op, " ", " ", len(self.codeTable)])
+			self.codeTable.append(["BR", " ", " ", " "])
 
 			self.backPatch = len(self.codeTable)
 
@@ -703,7 +722,10 @@ class CodeGenerator(object):
 			else:
 				raise RejectException("Next token was '" + self.curToken + "' was expecting ')'")
 		elif self.curToken == "id":
-			self.semmantic_stack.append(self.curLexum)
+			if isinstance(SymbolTable.GetItem(self.curLexum), Func):
+				self.semmantic_stack.append(SymbolTable.GetItem(self.curLexum))
+			else:
+				self.semmantic_stack.append(self.curLexum)
 
 			self.Accept()
 			self.factor_lf()
@@ -726,10 +748,10 @@ class CodeGenerator(object):
 				params.append(self.semmantic_stack.pop())
 			func = self.semmantic_stack.pop()
 
-			self.codeTable.append(["call", len(params), "", func])
+			self.codeTable.append(["call", len(params), " ", func.name])
 			for param in params:
 				if param.strip() != "void":
-					self.codeTable.append(["arg", "", "", param.strip()])
+					self.codeTable.append(["arg", " ", " ", param.strip()])
 
 			#if len(params) != func.param_count:
 			#	raise RejectException("Invalid number of parameters")
@@ -738,7 +760,7 @@ class CodeGenerator(object):
 			#		if func.params[i].split(" ")[0] != params[i]:
 			#			raise RejectException("Invalid parameter types")
 
-			self.semmantic_stack.append(func)
+			self.semmantic_stack.append(func.name)
 
 			if self.curToken == ")":
 				self.Accept()

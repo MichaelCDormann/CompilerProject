@@ -1,9 +1,15 @@
+int test(int a, int b)
+{
+    return a*5-b/2;
+}
+
 void main(void)
 {
     int x;
     int y;
     int z;
+    int q;
 
-    z = x + y;
-
+    z = x + 5;
+    q = test(z, 5);
 }
