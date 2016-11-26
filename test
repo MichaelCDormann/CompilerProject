@@ -10,6 +10,12 @@ void main(void)
     int z;
     int q;
 
-    z = x + 5;
-    q = test(z, 5);
+    if (6 + 10 > z)
+    {
+        z = x + 5;
+        q = test(z, 5);
+    }
+    else {
+        x = x + z/y;
+    }
 }

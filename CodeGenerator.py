@@ -149,14 +149,14 @@ class CodeGenerator(object):
 		#	return "REJECT"
 		self.program()
 
-		for i, line in enumerate(self.codeTable):
-			if self.codeTable[i][0] == "asgn":
-				if self.codeTable[i-1][3] == self.codeTable[i][1]:
-					self.codeTable[i-1][3] = self.codeTable[i][3]
-					self.codeTable.remove(line)
+		#for i, line in enumerate(self.codeTable):
+		#	if self.codeTable[i][0] == "asgn":
+		#		if self.codeTable[i-1][3] == self.codeTable[i][1]:
+		#			self.codeTable[i-1][3] = self.codeTable[i][3]
+		#			self.codeTable.remove(line)
 
-		for line in self.codeTable:
-			print '{0:10}{1:10}{2:10}{3:10}'.format(str(line[0]), str(line[1]), str(line[2]), str(line[3]))
+		for i, line in enumerate(self.codeTable):
+			print '{0:5}{1:10}{2:10}{3:10}{4:10}'.format(str(i), str(line[0]), str(line[1]), str(line[2]), str(line[3]))
 
 	#---------------------------------------
 	# These methods actually do the parsing
@@ -350,7 +350,7 @@ class CodeGenerator(object):
 			self.compoundstmt()
 		elif self.curToken == "if":
 			self.selectionstmt()
-			self.codeTable[self.backPatch][4] = len(self.codeTable)
+			self.codeTable[self.backPatch][3] = len(self.codeTable)
 		elif self.curToken == "while":
 			self.iterationstmt()
 			#self.codeTable[self.backPatch][4] = len(self.codeTable) - 1
@@ -394,9 +394,9 @@ class CodeGenerator(object):
 		if self.curToken == "else":
 			self.Accept()
 
-			self.codeTable[self.backPatch][4] = len(self.codeTable)
+			self.codeTable[self.backPatch][3] = len(self.codeTable) + 1
 			self.codeTable.append(["BR", " ", " ", " "])
-			self.backPatch = len(self.codeTable)
+			self.backPatch = len(self.codeTable) - 1
 
 			self.statement()
 		elif self.curToken in ["return", "(", "while", "num", "float_num", "{", ";", "}", "id", "if"]:
@@ -614,10 +614,10 @@ class CodeGenerator(object):
 			self.codeTable.append(["comp", ls, rs, self.incrementTemp()])
 			self.semmantic_stack.append(self.getTemp())
 
-			self.codeTable.append([op, " ", " ", len(self.codeTable)])
+			self.codeTable.append([op, " ", self.getTemp(), len(self.codeTable) + 2])
 			self.codeTable.append(["BR", " ", " ", " "])
 
-			self.backPatch = len(self.codeTable)
+			self.backPatch = len(self.codeTable) - 1
 
 		elif self.curToken in [")", ";", "]", ","]:
 			pass
