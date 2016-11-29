@@ -68,7 +68,8 @@ class CodeGenerator(object):
 
 		self.codeTable = list()
 		self.tempCount = 0
-		self.backPatch = 0
+		#self.backPatch = 0
+		self.backPatchStack = []
 		self.exitFunc = False
 		#self.bool_main = False
 
@@ -350,10 +351,12 @@ class CodeGenerator(object):
 			self.compoundstmt()
 		elif self.curToken == "if":
 			self.selectionstmt()
-			self.codeTable[self.backPatch][3] = len(self.codeTable)
+			backPatch = self.backPatchStack.pop()
+			self.codeTable[backPatch][3] = len(self.codeTable)
 		elif self.curToken == "while":
 			self.iterationstmt()
-			self.codeTable[self.backPatch][3] = len(self.codeTable)
+			backPatch = self.backPatchStack.pop()
+			self.codeTable[backPatch][3] = len(self.codeTable)
 		elif self.curToken == "return":
 			self.returnstmt()
 		else:
@@ -394,9 +397,10 @@ class CodeGenerator(object):
 		if self.curToken == "else":
 			self.Accept()
 
-			self.codeTable[self.backPatch][3] = len(self.codeTable) + 1
+			backPatch = self.backPatchStack.pop()
+			self.codeTable[backPatch][3] = len(self.codeTable) + 1
 			self.codeTable.append(["BR", " ", " ", " "])
-			self.backPatch = len(self.codeTable) - 1
+			self.backPatchStack.append(len(self.codeTable) - 1)
 
 			self.statement()
 		elif self.curToken in ["return", "(", "while", "num", "float_num", "{", ";", "}", "id", "if"]:
@@ -522,7 +526,7 @@ class CodeGenerator(object):
 			params.reverse()
 			func = self.semmantic_stack.pop()
 
-			self.codeTable.append(["call", len(params), "", func.name])
+			self.codeTable.append(["call", len(params), func.name, self.incrementTemp()])
 			for param in params:
 				if param.strip() != "void":
 					self.codeTable.append(["arg", " ", " ", param.strip()])
@@ -538,7 +542,7 @@ class CodeGenerator(object):
 			#		if func.params[i].split(" ")[0] != params[i]:
 			#			raise RejectException("Invalid parameter types")
 
-			self.semmantic_stack.append(func.name)
+			self.semmantic_stack.append(self.getTemp())
 			#self.dontpop = False -- used in expression
 
 			if self.curToken == ")":
@@ -617,7 +621,7 @@ class CodeGenerator(object):
 			self.codeTable.append([op, " ", self.getTemp(), len(self.codeTable) + 2])
 			self.codeTable.append(["BR", " ", " ", " "])
 
-			self.backPatch = len(self.codeTable) - 1
+			self.backPatchStack.append(len(self.codeTable) - 1)
 
 		elif self.curToken in [")", ";", "]", ","]:
 			pass
