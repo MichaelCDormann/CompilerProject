@@ -26,13 +26,7 @@ Some of the semantic checks implemented are:
 
 ### General Design
 
-I decided to implement this with a stack. In general when an ID, float, or int is encountered it pushes it onto the
-stack. Then later those items are popped off of the stack and compared to do the semantic analysis. When a function
-is called it gets pushed onto the stack and then any subsequent parameters are also pushed onto the stack. Then
-items are popped off of the stack until a function is the last item popped off. Then semantic tests are performed
-on the function call and it's parameters. When a function is declared it is pushed onto a separate function stack.
-Then at the end of the declaration the function is popped off and semantic tests are performed on the return information.
-The SymbolTable class methods do semantic tests on items inserted and searched for in the list of tables.
+I decided to implement this with a stack. In general when an ID, float, or int is encountered it pushes it onto the stack. Then later those items are popped off of the stack and compared to do the semantic analysis. When a function is called it gets pushed onto the stack and then any subsequent parameters are also pushed onto the stack. Then items are popped off of the stack until a function is the last item popped off. Then semantic tests are performed on the function call and it's parameters. When a function is declared it is pushed onto a separate function stack. Then at the end of the declaration the function is popped off and semantic tests are performed on the return information. The SymbolTable class methods do semantic tests on items inserted and searched for in the list of tables.
 
 ### How to Run
 
